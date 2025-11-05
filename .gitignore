@@ -7,3 +7,6 @@ yarn-error.log
 # VS CODE
 settings.json
 .vscode
+
+# Large data files
+src/data/nc-stops.csv
