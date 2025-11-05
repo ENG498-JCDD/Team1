@@ -31,7 +31,7 @@ d3.rollup(
 )
 ```
 
-### Count by Race and 
+### Count by Race and Action
 ```js
 d3.rollup(
   raleighStops,
@@ -40,3 +40,13 @@ d3.rollup(
     d => d.raw_action_description
 )
 ```
+
+### Count by Race and Search
+```js
+d3.rollup(
+  raleighStops,
+  v => v.length,
+  d => d.subject_race,
+    d => d.search_conducted,
+)
+
