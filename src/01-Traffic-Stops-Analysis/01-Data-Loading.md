@@ -3,7 +3,7 @@
 ## Loading the Data
 
 ```js
-const raleighStops = FileAttachment("./../data/nc-stops/raleigh-stops.csv").csv({typed: true});
+const raleighStops = FileAttachment("./../data/nc-stops.csv").csv({typed: true});
 ```
 
 <p class="codeblock-caption">
