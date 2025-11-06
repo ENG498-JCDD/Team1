@@ -5,5 +5,5 @@ const policeData = FileAttachment("data/policestops.csv").csv({typed: true})
 ```
 
 ```js
-policeData[0]
+policeData
 ```
