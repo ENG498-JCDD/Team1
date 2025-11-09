@@ -172,7 +172,7 @@ const ncPoliceStops = csvParse(
     const datetime = isoParse(`${d.date}T${d.time}Z`);
     return {
       id: d.raw_row_number,
-      datetime, // might be null if bad format
+      datetime,
       location: normalizeLocation(d.location),
       age: d.subject_age,
       race: d.subject_race,
@@ -199,7 +199,7 @@ const ncPoliceStops = csvParse(
 
 
 const filtered = ncPoliceStops.filter(d => {
-  if (!d.datetime) return false; // skip invalid/missing
+  if (!d.datetime) return false;
   const year = d.datetime.getUTCFullYear();
   return year >= 2011 && year <= 2015;
 });
