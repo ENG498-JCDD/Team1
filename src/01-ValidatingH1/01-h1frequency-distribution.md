@@ -21,3 +21,37 @@ Let's explore the data to fnd out:
 
 First, let's load our Raleigh traffic stops dataset (2011-2015):
 
+```js
+const raleighStops = FileAttachment("../data/updated-nc-stops.csv").csv({typed: true});
+```
+
+<p class="codeblock-caption">
+  Interactive output of Raleigh traffic stops <code>raleighStops</code>
+</p>
+
+```js
+raleighStops
+```
+
+## Part 1: Understanding Our Dataset by Race
+
+Before we look at searches, let's understand the basic components of our dataset. Which racial groups are represented in our traffic stop data, and how frequently was each group stopped?
+
+### Counting Stops by Race
+
+Let's start by exploring the racial distribution of traffic stops using d3.rollup:
+
+```js
+const stopsByRace = d3.rollup(
+  raleighStops,
+  v => v.length,
+  d => d.race
+)
+```
+<p class="codeblock-caption">
+  Interactive output of Raleigh traffic stops <code>by race</code>
+</p>
+
+```js
+stopsByRace
+```
