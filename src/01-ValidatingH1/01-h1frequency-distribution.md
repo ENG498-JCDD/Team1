@@ -205,5 +205,27 @@ Let's do a comprehensive three-level rollup to examine race, gender, and search 
 import {threeLevelRollUpFlatMap} from "./utils/utils.js";
 ```
 
+```js
+// Filter for women drivers only
+const womenDrivers = raleighStops.filter(
+  d => d.sex == "female"
+)
+
+const womenRacePersonSearch = threeLevelRollUpFlatMap(
+  womenDrivers,
+  "race",
+  "sex",
+  "search_person",
+  "count"
+)
+```
+
+<p class="codeblock-caption">
+  Women only: <code>race × sex × search_person</code>
+</p>
+
+```js
+womenRacePersonSearch
+```
 
 
