@@ -6,15 +6,17 @@ export default {
   // The pages and sections in the sidebar. If you don’t specify this option,
   // all pages will be listed in alphabetical order. Listing pages explicitly
   // lets you organize them into sections and have unlisted pages.
-  // pages: [
-  //   {
-  //     name: "Examples",
-  //     pages: [
-  //       {name: "Dashboard", path: "/example-dashboard"},
-  //       {name: "Report", path: "/example-report"}
-  //     ]
-  //   }
-  // ],
+  pages: [
+    {
+      name: "Hypothesis 2",
+      pages: [
+        {name: "Exigency", path: "/02-ValidatingH2/01-h2exigency"},
+        {name: "FQ", path: "/02-ValidatingH2/01-h2frequency-distribution"},
+        {name: "Visuals", path: "/02-ValidatingH2/01-h2visualizationAnalysis"},
+        {name: "Implication", path: "/02-ValidatingH2/01-h2implication"},
+      ]
+    },
+  ],
 
   // Content to add to the head of the page, e.g. for a favicon:
   head: '<link rel="icon" href="observable.png" type="image/png" sizes="32x32">',
