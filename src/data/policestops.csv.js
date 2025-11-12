@@ -1,10 +1,8 @@
 import {csvFormat, csvParse} from "d3-dsv";
-import {isoParse} from "d3-time-format";
+import {utcParse, isoParse} from "d3-time-format";
 
 // Fetches data from hosted URL
 // Used in csvParse()
-// wrote this quickly.
-
 async function text(url) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`fetch failed: ${response.status}`);
@@ -13,8 +11,7 @@ async function text(url) {
 
 // Use this Map to normalize the location data,
 // but be sure to review and check it, because I
-
-
+// wrote this quickly.
 const LOCATIONS = new Map(
   [
     ["RA, Wake County", "Raleigh"],
@@ -56,60 +53,52 @@ const LOCATIONS = new Map(
 
 // Normalize varied location values and
 // map strange or empty inputs as "UNKNOWN"
-
 function normalizeLocation(d) {
   return LOCATIONS.get(d) ?? "UNKNOWN";
 }
 
 /**
-  * ncPoliceStops: Load and parse police data
-  * from GH and trim down to smaller size, where
-  * possible
-  *
-  * Redundant Columns Info Removed:
-  *
-  * department_name == "Raleigh Police Department"
-  * type == "vehicular"
-  * county_name == "Wake County"
-  * raw_Ethnicity
-  * raw_Race
-  * raw_action_description
-*/
-
+ * ncPoliceStops: Load and parse police data
+ * from GH and trim down to smaller size, where
+ * possible
+ *
+ * Redundant Columns Info Removed:
+ *
+ * department_name == "Raleigh Police Department"
+ * type == "vehicular"
+ * county_name == "Wake County"
+ * raw_Ethnicity
+ * raw_Race
+ * raw_action_description
+ */
 const ncPoliceStops = csvParse(
   await text("https://media.githubusercontent.com/media/ENG498-JCDD/Team1/refs/heads/main/src/data/nc-stops.csv"),
-  (d) => {
-    const datetime = isoParse(`${d.date}T${d.time}Z`);
-    return {
-      id: d.raw_row_number,
-      datetime,
-      location: normalizeLocation(d.location),
-      age: d.subject_age,
-      race: d.subject_race,
-      sex: d.subject_sex,
-      officer_id_hash: d.officer_id_hash,
-      arrest_made: d.arrest_made,
-      citation_issued: d.citation_issued,
-      warning_issued: d.warning_issued,
-      outcome: d.outcome,
-      contraband_found: d.contraband_found,
-      contraband_drugs: d.contraband_drugs,
-      contraband_weapons: d.contraband_weapons,
-      frisk_performed: d.frisk_performed,
-      search_conducted: d.search_conducted,
-      search_person: d.search_person,
-      search_vehicle: d.search_vehicle,
-      search_basis: d.search_basis,
-      reason_for_frisk: d.reason_for_frisk,
-      reason_for_search: d.reason_for_search,
-      reason_for_stop: d.reason_for_stop,
-    };
-  }
-);
-
+  (d) => ({
+    id: d.raw_row_number,
+    datetime: isoParse(`${d.date}T${d.time}`),
+    location: normalizeLocation(d.location),
+    age: d.subject_age,
+    race: d.subject_race,
+    sex: d.subject_sex,
+    officer_id_hash: d.officer_id_hash,
+    arrest_made: d.arrest_made,
+    citation_issued: d.citation_issued,
+    warning_issued: d.warning_issued,
+    outcome: d.outcome,
+    contraband_found: d.contraband_found, // NA
+    contraband_drugs: d.contraband_drugs, // NA
+    contraband_weapons: d.contraband_weapons, // NA
+    frisk_performed: d.frisk_performed, // boolean
+    search_conducted: d.search_conducted,
+    search_person: d.search_person,
+    search_vehicle: d.search_vehicle,
+    search_basis: d.search_basis,
+    reason_for_frisk: d.reason_for_frisk,
+    reason_for_search: d.reason_for_search,
+    reason_for_stop: d.reason_for_stop,
+  })
+)
 // IDEA: Reduce data even more by
-// creating separate data loader files,
-// based on filtering options.
 // creating separate data loader files,
 // based on filtering options.
 // .filter((d) => d.search_conducted === "TRUE")
@@ -118,8 +107,7 @@ const ncPoliceStops = csvParse(
 // process.stdout.write(csvFormat(ncPoliceStops));
 
 const filtered = ncPoliceStops.filter(d => {
-  if (!d.datetime) return false;
-  const year = d.datetime.getUTCFullYear();
+  const year = d.datetime.getFullYear();
   return year >= 2011 && year <= 2015;
 });
 
