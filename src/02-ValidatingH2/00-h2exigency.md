@@ -5,3 +5,4 @@ Traffic stops are influenced by race, but also by the date and time that these s
 On the contrary, during nighttime, when Black drivers cannot be visibly identified, they are pulled over less.
 
 As a team, we are utilizing 3 level roll up strategies in order to analyze frequencies within race, date and time. 
+
