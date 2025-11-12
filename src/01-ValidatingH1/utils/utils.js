@@ -15,3 +15,27 @@ export const getUniquePropListBy = (arr, key) => {
   }
   return uniqList
 }
+
+import {rollups} from "npm:d3-array";
+
+// oneLevelRollUpFlatMap function
+
+export const oneLevelRollUpFlatMap = (data, level1Key, countKey) => {
+  // 1. Rollups on one level
+  const colTotals = rollups(
+    data,
+    (v) => v.length, // Count length of leaf node
+    (d) => d[level1Key] // d["race"]
+  )
+  
+  // 2. Flatten back to array of objects
+  const flatTotals = colTotals.flatMap((e) => {
+    return {
+      [level1Key]: e[0],
+      [countKey]: e[1]
+    }
+  })
+  
+  // 3. Return the sorted totals
+  return flatTotals
+}
