@@ -1,3 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 src/data/nc-stops.csv filter=lfs diff=lfs merge=lfs -text
+src/data/policestops-with-townships.csv filter=lfs diff=lfs merge=lfs -text
