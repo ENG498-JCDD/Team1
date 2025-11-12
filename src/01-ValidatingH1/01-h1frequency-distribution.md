@@ -55,3 +55,9 @@ const stopsByRace = d3.rollup(
 ```js
 stopsByRace
 ```
+
+This gives us a Map structure showing the count for each racial group. For easier analysis and visualization, let's convert this into a cleaner array format:
+
+```js
+
+```
