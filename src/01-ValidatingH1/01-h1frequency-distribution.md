@@ -26,7 +26,7 @@ const raleighStops = FileAttachment("../data/updated-nc-stops.csv").csv({typed: 
 ```
 
 <p class="codeblock-caption">
-  Interactive output of Raleigh traffic stops <code>raleighStops</code>
+  Interactive output of full data set in <code>raleighStops</code>
 </p>
 
 ```js
