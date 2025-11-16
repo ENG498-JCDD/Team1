@@ -1,4 +1,4 @@
-# H1: Search Disparities- Frequency Distribution Analysis
+# H1: Search Disparities- Frequency Distribution Analysis and Visualization
 
 ## Overview
 
@@ -22,7 +22,7 @@ Let's explore the data to fnd out.
 First, let's load our Raleigh traffic stops dataset (2011-2015):
 
 ```js
-const raleighStops = FileAttachment("../data/policestops.csv").csv({typed: true});
+const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true});
 ```
 
 <p class="codeblock-caption">
@@ -59,7 +59,7 @@ stopsByRaceMap
 This gives us a Map structure showing the count for each racial group. For easier analysis and visualization, let's convert this into a cleaner array format:
 
 ```js
-import {oneLevelRollUpFlatMap} from "./utils/utils.js";
+import {oneLevelRollUpFlatMap} from "./utils/utilsH1.js";
 
 const stopsByRace = oneLevelRollUpFlatMap(
   raleighStops,
@@ -90,6 +90,10 @@ Looking at our data, we can see the traffic stop distribution across racial grou
 **Total stops:** 330,967
 
 **Key observation:** Black drivers represent nearly half (48.8%) of all traffic stops, slightly more than White drivers (40.8%). This establishes our baseline. Now let's investigate whether search rates are proportional to these stop numbers, or if certain groups face disproportionate search rates.
+
+```js
+// could add a visualization
+```
 
 ## Part 2: Search Rates by Race
 
@@ -134,23 +138,43 @@ There are two types of searches officers can conduct:
 
 ```js
 // only for person search
-const personSearches = raleighStops.filter(
-  d => d.search_person == "TRUE"
-)
+// consider applying 2levelrollup
+// rather han doing this way consider this way race > search person (true, false) > search count
+// const personSearches = raleighStops.filter(
+//   d => d.search_person == "TRUE"
+// )
 
-const personSearchByRace = oneLevelRollUpFlatMap(
-  personSearches,
+// const personSearchByRace = oneLevelRollUpFlatMap(
+//   personSearches,
+//   "race",
+//   "person_search_count"
+// )
+// ```
+// <p class="codeblock-caption">
+//   Interactive output of Raleigh traffic stops <code>by race and person search</code>
+// </p>
+
+// ```js
+// personSearchByRace
+// // can add a visualization here
+
+import {twoLevelRollUpFlatMap} from "./utils/utilsH1.js";
+
+const racePersonSearch = twoLevelRollUpFlatMap(
+  raleighStops,
   "race",
-  "person_search_count"
+  "search_person",
+  "count"
 )
 ```
 <p class="codeblock-caption">
-  Interactive output of Raleigh traffic stops <code>by race and person search</code>
+   Interactive output of Raleigh traffic stops <code>by race and person search</code>
 </p>
 
 ```js
-personSearchByRace
+racePersonSearch
 ```
+
 
 **Key Observation:** Black drivers experienced 2.7 times more person searches than white drivers. This is nearly identitical to the overall search disparity, showing that racial disparity is not limited to one type of search.
 
@@ -161,23 +185,38 @@ Person searches are particularly invasive as they involve physically searching t
 Let's now examine vehicles searches to see if the same pattern holds.
 
 ```js
-const vehicleSearches = raleighStops.filter(
-  d => d.search_vehicle == "TRUE"
-)
+// follow same thing as previous one. 2 levelrollup
+// const vehicleSearches = raleighStops.filter(
+//   d => d.search_vehicle == "TRUE"
+// )
 
-const vehicleSearchByRace = oneLevelRollUpFlatMap(
-  vehicleSearches,
+// const vehicleSearchByRace = oneLevelRollUpFlatMap(
+//   vehicleSearches,
+//   "race",
+//   "vehicle_search_count"
+// )
+// ```
+
+// <p class="codeblock-caption">
+//   Interactive output of Raleigh traffic stops <code>by race and vehicle search</code>
+// </p>
+
+// ```js
+// vehicleSearchByRace
+
+const raceVehicleSearch = twoLevelRollUpFlatMap(
+  raleighStops,
   "race",
-  "vehicle_search_count"
+  "search_vehicle",
+  "count"
 )
 ```
-
 <p class="codeblock-caption">
-  Interactive output of Raleigh traffic stops <code>by race and vehicle search</code>
+   Interactive output of Raleigh traffic stops <code>by race and vehicle search</code>
 </p>
 
 ```js
-vehicleSearchByRace
+raceVehicleSearch
 ```
 
 **Key Observation:** Black drivers experienced 2.8 times more vehicle searches than White drivers which is slightly higher than the overall 2.7 times disparity.
@@ -202,13 +241,13 @@ Women are often stereotyped as "safer" or "more cautious" drivers. If racial dis
 Let's do a comprehensive three-level rollup to examine race, gender, and search patterns simultaneously:
 
 ```js
-import {threeLevelRollUpFlatMap} from "./utils/utils.js";
+import {threeLevelRollUpFlatMap} from "./utils/utilsH1.js";
 ```
 
 ```js
 // Filter for women drivers only
 const womenDrivers = raleighStops.filter(
-  d => d.sex == "female"
+  d => d.sex == "female" && (d.race == "black" || d.race == "white")
 )
 
 const womenRacePersonSearch = threeLevelRollUpFlatMap(
@@ -226,4 +265,9 @@ const womenRacePersonSearch = threeLevelRollUpFlatMap(
 
 ```js
 womenRacePersonSearch
+// consider adding a visualization in the observation section
 ```
+
+**Key Observation:** Black women are person-searched at a rate of 2%, while White women are searched at 1.44%. This means, Black women are 1.4 times more likely to experience person searches than White women. 
+
+This proves that, even among women drivers who are stereotypically considered safer and less threatening, the racial disparity persist. The demonstrates that race, not gender stereotypes or driving behavior, is the primary factor influencing search decisions.

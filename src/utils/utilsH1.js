@@ -42,6 +42,46 @@ export const oneLevelRollUpFlatMap = (data, level1Key, countKey) => {
 
 // twoLevelRollUpFlatMap function
 
+export const twoLevelRollUpFlatMap = (data, level1Key, level2Key, countKey) => {
+
+  // 1. Rollups on 2 nested levels
+  const colTotals = rollups(
+    data,
+    (v) => v.length, //Count length of leaf node
+    (d) => d[level1Key], //Accessor at 1st level
+      (d) => d[level2Key], //Accessor at 2nd level
+  )
+
+  // 2. Flatten 1st grouped level back to array of objects
+  const flatTotals = colTotals.flatMap((l1Elem) => {
+
+    // 2.1 Assign level 1 key
+    let l1KeyValue = l1Elem[0]
+
+    // 2.2 Flatten 2nd grouped level
+    const flatLevels = l1Elem[1].flatMap((l2Elem) => {
+
+      // 2.2.1 Assign level 2 key
+      let l2KeyValue = l2Elem[0]
+
+      // l2Elem[1].flatMap()
+
+      // 2.2.2 Return fully populated object
+      return {
+        [level1Key]: l1KeyValue,
+        [level2Key]: l2KeyValue,
+        [countKey]: l2Elem[1]
+      }
+    })
+
+    // 3. Return flattened array of objects
+    return flatLevels
+  })
+
+  // 3. Return the sorted totals
+  return flatTotals
+}
+
 // threeLevelRollUpFlatMap function
 
 export const threeLevelRollUpFlatMap = (data, level1Key, level2Key, level3Key, countKey) => {
