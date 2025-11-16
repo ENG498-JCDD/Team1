@@ -7,15 +7,11 @@ export default {
   // all pages will be listed in alphabetical order. Listing pages explicitly
   // lets you organize them into sections and have unlisted pages.
   pages: [
-    {
-      name: "Hypothesis 2",
-      pages: [
-        {name: "Exigency", path: "/02-ValidatingH2/01-h2exigency"},
-        {name: "FQ", path: "/02-ValidatingH2/01-h2frequency-distribution"},
-        {name: "Visuals", path: "/02-ValidatingH2/01-h2visualizationAnalysis"},
-        {name: "Implication", path: "/02-ValidatingH2/01-h2implication"},
-      ]
-    },
+    {name: "Setting the Scene", path: "/01 Setting the Scene"},
+    {name: "Stopped and Searched", path: "/02 Stopped and Searched"},
+    {name: "Hidden in Darkness", path: "/03 Hidden in Darkness"},
+    {name: "Punished Unequally", path: "/04 Punished Unequally"},
+    {name: "What the Data Reveals", path: "/05 What the Data Reveals"},
   ],
 
   // Content to add to the head of the page, e.g. for a favicon:
@@ -23,6 +19,9 @@ export default {
 
   // The path to the source root.
   root: "src",
+
+  // Change theme
+  theme: "light",
 
   // Some additional configuration options and their defaults:
   // theme: "default", // try "light", "dark", "slate", etc.
