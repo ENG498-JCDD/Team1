@@ -167,16 +167,13 @@ const ncPoliceStops = csvParse(
 // based on filtering options.
 // .filter((d) => d.search_conducted === "TRUE")
 
+const ncPoliceStopsData = ncPoliceStops.filter(d => {
+  if (d.datetime !== null) {
+    const year = d.datetime.getFullYear();
+    return (year >= 2011) && (year <= 2015);
+  }
+  return false;
+});
+
 // Write out csv formatted data.
-process.stdout.write(csvFormat(ncPoliceStops));
-
-// const filtered = ncPoliceStops.filter(d => {
-//   if (d.datetime !== null) {
-//     const year = d.datetime.getFullYear();
-//     if ((year >= 2011) && (year <= 2015)) {
-//       return d
-//     }
-//   }
-// });
-
-// process.stdout.write(csvFormat(filtered));
+process.stdout.write(csvFormat(ncPoliceStopsData));

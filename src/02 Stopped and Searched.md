@@ -5,17 +5,17 @@
 In this chapter, we investigate whether Black drivers experience discriminatory search practices during traffic stops. We will examine:
 
 1. **Search patterns by race** - Are black drivers searched more often?
-2. **Types of searches** - Person searches vs. vehicle searches.
-3. **Contraband discovery rates** - When searched happen, is contraband actually found?
-4. **Contrabands types** - Drugs vs weapons.
+2. **Types of searches** - Do disparities exist in both person searches and vehicle searches?
+3. **Gender-specific patterns** - Do racial disparities persist even among women drivers, who are stereotypically considered "safer"?
+4. **Contraband discovery rates** - When searches occur, is contraband actually found? Do discovery rates justify the search rate disparities?
 
-**Our hypothesis:** If Black drivers are searched more frequently but contraband is found less often, this indicates racial profiling rather than evidence-based policing.
+**Our hypothesis:** If Black drivers are searched more frequently but contraband is found at similar or lower rates, this indicates racial profiling rather than evidence-based policing. However, we must also consider whether higher contraband discovery rates proportionally justify higher search rates.
 
 ## Research Question
 
-**Do Black drivers experience both higher search rates and lower contraband discovery rates compared to white drivers?**
+**Do Black drivers experience disproportionate search rates compared to White drivers, and if so, are these disparities justified by contraband discovery patterns?**
 
-Let's explore the data to fnd out.
+Let's explore the data to find out.
 
 ## Loading the Data
 
@@ -230,13 +230,13 @@ This suggests that once a Black driver is subjected to a person search, officers
 
 ## Part 3: Gender-Specific Analysis - Black Women vs White Women Drivers
 
-We,ve established clear racial disparities in oerall search rates. Now, let's test this pattern further by examining a specific subgroup: "Women Drivers". 
+We've established clear racial disparities in overall search rates. Now, let's test this pattern further by examining a specific subgroup: "Women Drivers". 
 
-Women are often stereotyped as "safer" or "more cautious" drivers. If racial disparities persist even among women drivers who presumably pose less threat, this would provide even strong evidencethat searches are based on race rather than driving behavior or legitimate safety concerns.
+Women are often stereotyped as "safer" or "more cautious" drivers. If racial disparities persist even among women drivers who presumably pose less threat, this would provide even strong evidence that searches are based on race rather than driving behavior or legitimate safety concerns.
 
 **Research Question:** Do Black women drivers face higher search rates than white women drivers, despite both groups being women?
 
-### Three-Level Analyssi: Race > Gender > Search Status
+### Three-Level Analysis: Race > Gender > Search Status
 
 Let's do a comprehensive three-level rollup to examine race, gender, and search patterns simultaneously:
 
@@ -247,7 +247,8 @@ import {threeLevelRollUpFlatMap} from "./utils/utilsH1.js";
 ```js
 // Filter for women drivers only
 const womenDrivers = raleighStops.filter(
-  d => d.sex == "female" && (d.race == "black" || d.race == "white")
+  d => d.sex == "female" 
+  // && (d.race == "black" || d.race == "white")
 )
 
 const womenRacePersonSearch = threeLevelRollUpFlatMap(
@@ -260,7 +261,7 @@ const womenRacePersonSearch = threeLevelRollUpFlatMap(
 ```
 
 <p class="codeblock-caption">
-  Women only: <code>race × sex × search_person</code>
+  Interactive output of women only: <code>race × sex × search_person</code>
 </p>
 
 ```js
@@ -268,6 +269,43 @@ womenRacePersonSearch
 // consider adding a visualization in the observation section
 ```
 
-**Key Observation:** Black women are person-searched at a rate of 2%, while White women are searched at 1.44%. This means, Black women are 1.4 times more likely to experience person searches than White women. 
+**Key Observation:** Black women are person-searched at a rate of 2.02%, while White women are searched at 1.39%. This means, Black women are 1.45 times more likely to experience person searches than White women. 
 
-This proves that, even among women drivers who are stereotypically considered safer and less threatening, the racial disparity persist. The demonstrates that race, not gender stereotypes or driving behavior, is the primary factor influencing search decisions.
+This proves that, even among women drivers who are stereotypically considered safer and less threatening, the racial disparity persist. This demonstrates that race, not gender stereotypes or driving behavior, is the primary factor influencing search decisions.
+
+## Part 4: Contraband Discovery Analysis
+
+So far, our analysis found that Black drivers are searched at significantly higher rates than White drivers. Now, here comes a critical question: When Black drivers are searched, is contraband actually found more often?
+
+The logic behind this is if searches are based on legitimate evidence, then higher search rates should mean higher contraband discovery rates. However, if searches are based on racial bias, then higher search rates will show lower contraband discovery rates because searches lack proper evidence.
+
+### Three-Level Analysis: Race > Search Conducted > Contraband Found
+
+Now, we need to examine the contraband discovery patterns, and to do this effectively, we'll use a three level rollup that groups our data by race, search conducted, and contraband found. This will allow us to see, for each racial group, how many searches were conducted and how many of those searches actually resulted in finding contraband. 
+
+```js
+
+const stopsWithContrabandData = raleighStops.filter(
+  d => d.contraband_found !== "NA"
+)
+
+const raceSearchContraband = threeLevelRollUpFlatMap(
+  stopsWithContrabandData,
+  "race",
+  "search_conducted",
+  "contraband_found",
+  "count"
+)
+```
+
+<p class="codeblock-caption">
+  Interactive output of three-level analysis: <code>race × search_conducted × contraband_found</code>
+</p>
+
+```js
+raceSearchContraband
+// present the finding with visualization
+```
+**Key Observation:** Interestingly, Black drivers show a slightly higher contraband discovery rate (19.3%) compared to White drivers (15.3%). This difference means that when Black drivers are searched , contraband is found approximately 1.3 times more often than when White drivers are searched.
+
+However, this finding requires careful interpretation. While the higher hit rate might initially seem to justify the higher search rates for Black drivers, the disparity remains problematic. Black drivers are searched 2.7 times more frequently than White drivers, yet the contraband discovery rate is only 1.3 times higher. This suggests that the threshold for conducting searches may still be lower for Black drivers, officers may be more willing to search Black drivers on weaker evidence. Additionally, a 4% difference in hit rates does not proportionally justify a 170% increase in search rates (2.7x). If searches were truly evidence-based and unbiased, we would expect the search rate disparity to more closely match the contraband discovery rate disparity.
