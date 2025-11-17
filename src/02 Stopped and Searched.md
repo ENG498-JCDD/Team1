@@ -184,25 +184,6 @@ Person searches are particularly invasive as they involve physically searching t
 Let's now examine vehicles searches to see if the same pattern holds.
 
 ```js
-// follow same thing as previous one. 2 levelrollup
-// const vehicleSearches = raleighStops.filter(
-//   d => d.search_vehicle == "TRUE"
-// )
-
-// const vehicleSearchByRace = oneLevelRollUpFlatMap(
-//   vehicleSearches,
-//   "race",
-//   "vehicle_search_count"
-// )
-// ```
-
-// <p class="codeblock-caption">
-//   Interactive output of Raleigh traffic stops <code>by race and vehicle search</code>
-// </p>
-
-// ```js
-// vehicleSearchByRace
-
 const raceVehicleSearch = twoLevelRollUpFlatMap(
   raleighStops,
   "race",
