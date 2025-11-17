@@ -175,7 +175,6 @@ const racePersonSearch = twoLevelRollUpFlatMap(
 racePersonSearch
 ```
 
-
 **Key Observation:** Black drivers experienced 2.7 times more person searches than white drivers. This is nearly identitical to the overall search disparity, showing that racial disparity is not limited to one type of search.
 
 Person searches are particularly invasive as they involve physically searching the driver's body. The fact that Black drivers face this more intrusive search at such a disproportionate rate raises serious concerns about discriminatory enforcement practices.
