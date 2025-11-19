@@ -13,8 +13,9 @@ Our hypothesis, or h3, is: Black drivers receive harsher outcomes than White dri
 ### Research Question
 **Are black drivers searched for similar reasons to white drivers, and are these searches jutified by contraband found?**
 
-Let us investigate the data to find out.
+Let's investigate the data to find out!
 
+## Load the data
 ```js
 const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true})
 ```
@@ -27,6 +28,18 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 raleighStops
 ```
 
+```js
+constStopsRace = d3.rollup(
+  raleighStops,
+  (d) = d.length,
+  (d) = d.race,
+)
+```
 
+Interactive output of our dataset counted by length.
+
+```js
+constStopsRace
+```
 
 

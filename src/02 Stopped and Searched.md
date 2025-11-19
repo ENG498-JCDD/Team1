@@ -42,9 +42,13 @@ Before we look at searches, let's understand the basic components of our dataset
 Let's start by exploring the racial distribution of traffic stops using d3.rollup:
 
 ```js
+import {InternMap} from "d3-array"
+
+```
+```js
 const stopsByRaceMap = d3.rollup(
   raleighStops,
-  v => v.length,
+  d => D.length,
   d => d.race
 )
 ```
