@@ -29,3 +29,38 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 ```js
 raleighStops
 ```
+
+
+```js
+let raleighStopsInDarkRollUp = d3.rollup(
+  raleighStops,
+  // (leaf) => leaf.length,
+  (leaf) => {
+    return {
+      meanAge: d3.mean(leaf, l => l.age)
+    }
+  },
+  (D) => D.race,
+  (d) => d.datetime,
+    (d) => d.outcome
+);
+```
+
+raleighStopsInDarkRollUp
+
+```js
+raleighStopsInDarkRollUp
+```
+
+
+```js
+const raleighStopsInDarkGroup = d3.group(raleighStops, 
+(d) => d.race,
+  (d) => d.datetime,
+    (d) => d.outcome
+)
+```
+
+```js
+raleighStopsInDarkGroup
+```
