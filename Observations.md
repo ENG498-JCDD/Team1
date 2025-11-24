@@ -1,0 +1,5 @@
+
+# Observations 
+
+It is remarkable how easy it is to find information about those arrested but how concealed the same information is around arresting officers. One of the clearest examples of this is the mugshot. Arrestee's headshots in state matters are not technically in the *public domain*, but they are considered *public records*, which means that, depending on the state, authorities are free to disclose them at-will. In the digital-age, that means that these photos may end up online circulating within social media accounts and/or predatory [tabloid journalist accounts](https://www.ncsl.org/technology-and-communication/mug-shots-and-booking-photo-websites), freely accesible by both potential employers and colleagues. Since studies show that over 77% of employers [google prospective employees](https://scholarship.stu.edu/cgi/viewcontent.cgi?article=1005&context=stlr) prior to coming to hiring decisions, this has grave implications for those who have ever experienced these encounters.
+
