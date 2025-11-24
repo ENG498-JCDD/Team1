@@ -94,21 +94,29 @@ Looking at our data, we can see the traffic stop distribution across racial grou
 ```js
 // Visualization: Traffic Stops by Race
 Plot.plot({
-  title: `Traffic Stops by Race (2011-2015)`,
-  marginBottom: 60,
   grid: true,
+  marginLeft: 100,
+  marginRight: 0,
+  marginBottom: 60,
+  marginTop: 60,
+  label: null,
+  color: {legend: true},
+  x: {label: "Race", padding: 0},
+  y: {label: "Absolute Frequency", padding: 0},
   marks: [
+    Plot.ruleY([0]),
+    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
     Plot.barY(
       stopsByRace,
       {
         x: "race",
         y: "count",
-        fill: "steelblue",
+        sort: {x: "-y"},
+        insetRight: 10,
+        insetLeft: 10,
         tip: true,
-        sort: {x: "-y"}
       }
-    ),
-    Plot.ruleY([0]),
+    )
   ]
 })
 ```
@@ -283,8 +291,10 @@ Now, we need to examine the contraband discovery patterns, and to do this effect
 
 ```js
 
+import {getUniquePropListBy} from "./utils/utilsH1.js"
+
 const stopsWithContrabandData = raleighStops.filter(
-  d => d.contraband_found !== "NA"
+  d => d.contraband_found != "NA"
 )
 
 const raceSearchContraband = threeLevelRollUpFlatMap(
@@ -302,8 +312,208 @@ const raceSearchContraband = threeLevelRollUpFlatMap(
 
 ```js
 raceSearchContraband
-// present the finding with visualization
 ```
+
+#### Visualizing Hit Rates
+
+Let's examine the contraband discovery rates visually to better understand the disparity between Black and White drivers.
+
+```js
+// present the finding with visualization
+// write reducer function
+/**
+ * Reducer function for contraband FOUND
+ * Returns count if contraband was found, else 0
+**/
+const contrabandFoundReducer = (d) => {
+  if (d.contraband_found == "TRUE" && d.search_conducted == "TRUE") {
+    return d.count
+  }
+  else {
+    return 0
+  }
+}
+
+/**
+ * Reducer function for contraband NOT FOUND
+ * Returns count if contraband was NOT found, else 0
+**/
+const contrabandNotFoundReducer = (d) => {
+  if (d.contraband_found == "FALSE" && d.search_conducted == "TRUE") {
+    return d.count
+  }
+  else {
+    return 0
+  }
+}
+```
+
+```js
+// Reducer properties & objectify reducerFuncs
+const reducerProps = [
+  "black",
+  "white"
+]
+
+const reducerFuncs = [
+  {
+    type: "FOUND",
+    func: contrabandFoundReducer
+  },
+  {
+    type: "NOT_FOUND",
+    func: contrabandNotFoundReducer
+  }
+]
+
+const uniqueRaceList = getUniquePropListBy(
+  raceSearchContraband,
+  "race"
+)
+```
+
+```js
+// 1. Create array for results
+const contrabandPercResults = []
+
+/**
+ * 2. Loop through RACE values
+**/
+for (const raceValue of reducerProps) {
+
+  // 3. Loop through reducer functions
+  for (const testorObj in reducerFuncs) {
+
+    /**
+     * Calculate the TOTAL searches for this race
+     * (This is the denominator for our percentage)
+    **/
+    const totalSearchesForRace = d3.sum(
+      raceSearchContraband,
+      (d) => {
+        if (d.race == raceValue && d.search_conducted == "TRUE") {
+          return d.count
+        }
+      }
+    )
+
+    /**
+     * Calculate the sum for FOUND or NOT_FOUND
+     * using the reducer function
+    **/
+    const summedUpLevel = d3.sum(
+      raceSearchContraband,
+      (d) => {
+        if (d.race === raceValue && d.search_conducted === "TRUE") {
+          const xTotalToSum = reducerFuncs[testorObj]["func"](d)
+          return xTotalToSum
+        }
+      }
+    )
+
+    // Push results
+    contrabandPercResults.push({
+      race: raceValue,
+      contraband_status: reducerFuncs[testorObj]["type"],
+      count: summedUpLevel,
+      total_searches: totalSearchesForRace,
+      percentage: summedUpLevel / totalSearchesForRace,
+    })
+  }
+}
+```
+<!-- <p class="codeblock-caption">
+  Output of contrabandPercResults
+</p> -->
+
+<!-- ```js
+contrabandPercResults
+``` -->
+
+```js
+// Filter the data for plotting
+// Filter for contraband FOUND only
+const blackFound = contrabandPercResults.filter(
+  (d) => {
+    if (d.race == "black" && d.contraband_status == "FOUND") {
+      return true
+    }
+  }
+)
+
+const whiteFound = contrabandPercResults.filter(
+  (d) => {
+    if (d.race == "white" && d.contraband_status == "FOUND") {
+      return true
+    }
+  }
+)
+```
+<!-- <p class="codeblock-caption">
+  Output of blackFound
+</p>
+
+```js
+blackFound
+```
+
+<p class="codeblock-caption">
+  Output of whiteFound
+</p>
+
+```js
+whiteFound
+``` -->
+
+```js
+// Step 6: Plot with TWO Plot.barY()
+Plot.plot({
+  height: 400,
+  marginLeft: 50,
+  marginRight: 100,
+  marginBottom: 40,
+  marginTop: 50,
+  grid: true,
+  
+  x: {
+    label: "RACE", padding: 0
+  },
+  
+  y: {
+    label: "Contraband Discovery Rate", padding: 0,
+    percent: true
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    Plot.barY(
+      blackFound,
+      {
+        x: "race",
+        y: "percentage",
+        fill: "Black",
+        tip: true,
+        insetLeft: 80,
+        insetRight: 80
+      }
+    ),
+    
+    Plot.barY(
+      whiteFound,
+      {
+        x: "race",
+        y: "percentage",
+        fill: "red",
+        tip: true,
+        insetLeft: 80,
+        insetRight: 80
+      }
+    )
+  ]
+})
+```
+
 **Key Observation:** Interestingly, Black drivers show a slightly higher contraband discovery rate (19.3%) compared to White drivers (15.3%). This difference means that when Black drivers are searched , contraband is found approximately 1.3 times more often than when White drivers are searched.
 
 However, this finding requires careful interpretation. While the higher hit rate might initially seem to justify the higher search rates for Black drivers, the disparity remains problematic. Black drivers are searched 2.7 times more frequently than White drivers, yet the contraband discovery rate is only 1.3 times higher. This suggests that the threshold for conducting searches may still be lower for Black drivers, officers may be more willing to search Black drivers on weaker evidence. Additionally, a 4% difference in hit rates does not proportionally justify a 170% increase in search rates (2.7x). If searches were truly evidence-based and unbiased, we would expect the search rate disparity to more closely match the contraband discovery rate disparity.
