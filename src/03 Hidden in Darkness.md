@@ -27,6 +27,23 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 ```
 
 ```js
+const monthNumberFormatter = d3.utcFormat("%m")
+const monthNameFormatter = d3.utcFormat("%B")
+```
+
+```js
+raleighStops.map(
+  (stop) => {
+    stop.monthNumber = monthNumberFormatter(stop.datetime)
+    stop.monthName = monthNameFormatter(stop.datetime)
+
+    return stop
+  }
+)
+```
+
+
+```js
 raleighStops
 ```
 
@@ -64,3 +81,5 @@ const raleighStopsInDarkGroup = d3.group(raleighStops,
 ```js
 raleighStopsInDarkGroup
 ```
+
+Total between 2011-2015: 323,898
