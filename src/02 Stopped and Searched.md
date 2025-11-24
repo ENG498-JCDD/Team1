@@ -163,27 +163,6 @@ There are two types of searches officers can conduct:
 ### Person Search counts
 
 ```js
-// only for person search
-// consider applying 2levelrollup
-// rather han doing this way consider this way race > search person (true, false) > search count
-// const personSearches = raleighStops.filter(
-//   d => d.search_person == "TRUE"
-// )
-
-// const personSearchByRace = oneLevelRollUpFlatMap(
-//   personSearches,
-//   "race",
-//   "person_search_count"
-// )
-// ```
-// <p class="codeblock-caption">
-//   Interactive output of Raleigh traffic stops <code>by race and person search</code>
-// </p>
-
-// ```js
-// personSearchByRace
-// // can add a visualization here
-
 import {twoLevelRollUpFlatMap} from "./utils/utilsH1.js";
 
 const racePersonSearch = twoLevelRollUpFlatMap(
@@ -384,10 +363,6 @@ for (const raceValue of reducerProps) {
   // 3. Loop through reducer functions
   for (const testorObj in reducerFuncs) {
 
-    /**
-     * Calculate the TOTAL searches for this race
-     * (This is the denominator for our percentage)
-    **/
     const totalSearchesForRace = d3.sum(
       raceSearchContraband,
       (d) => {
@@ -401,6 +376,7 @@ for (const raceValue of reducerProps) {
      * Calculate the sum for FOUND or NOT_FOUND
      * using the reducer function
     **/
+
     const summedUpLevel = d3.sum(
       raceSearchContraband,
       (d) => {
@@ -422,13 +398,6 @@ for (const raceValue of reducerProps) {
   }
 }
 ```
-<!-- <p class="codeblock-caption">
-  Output of contrabandPercResults
-</p> -->
-
-<!-- ```js
-contrabandPercResults
-``` -->
 
 ```js
 // Filter the data for plotting
@@ -449,24 +418,9 @@ const whiteFound = contrabandPercResults.filter(
   }
 )
 ```
-<!-- <p class="codeblock-caption">
-  Output of blackFound
-</p>
 
 ```js
-blackFound
-```
-
-<p class="codeblock-caption">
-  Output of whiteFound
-</p>
-
-```js
-whiteFound
-``` -->
-
-```js
-// Step 6: Plot with TWO Plot.barY()
+// Step 6: Plot with Plot.barY()
 Plot.plot({
   height: 400,
   marginLeft: 50,
