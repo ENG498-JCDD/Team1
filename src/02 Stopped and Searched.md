@@ -471,3 +471,8 @@ Plot.plot({
 **Key Observation:** Interestingly, Black drivers show a slightly higher contraband discovery rate (19.3%) compared to White drivers (15.3%). This difference means that when Black drivers are searched , contraband is found approximately 1.3 times more often than when White drivers are searched.
 
 However, this finding requires careful interpretation. While the higher hit rate might initially seem to justify the higher search rates for Black drivers, the disparity remains problematic. Black drivers are searched 2.7 times more frequently than White drivers, yet the contraband discovery rate is only 1.3 times higher. This suggests that the threshold for conducting searches may still be lower for Black drivers, officers may be more willing to search Black drivers on weaker evidence. Additionally, a 4% difference in hit rates does not proportionally justify a 170% increase in search rates (2.7x). If searches were truly evidence-based and unbiased, we would expect the search rate disparity to more closely match the contraband discovery rate disparity.
+
+
+The END
+
+
