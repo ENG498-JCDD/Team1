@@ -29,6 +29,9 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 ```js
 const monthNumberFormatter = d3.utcFormat("%m")
 const monthNameFormatter = d3.utcFormat("%B")
+const yearNumberFormatter = d3.utcFormat("%Y")
+const AmPmNumberFormatter = d3.utcFormat("%p")
+const HourNumberFormatter = d3.utcFormat("%I")
 ```
 
 ```js
@@ -36,6 +39,9 @@ raleighStops.map(
   (stop) => {
     stop.monthNumber = monthNumberFormatter(stop.datetime)
     stop.monthName = monthNameFormatter(stop.datetime)
+    stop.yearNumber = yearNumberFormatter(stop.datetime)
+    stop.AmPmNumber = AmPmNumberFormatter(stop.datetime)
+    stop.HourNumber = HourNumberFormatter(stop.datetime)
 
     return stop
   }
@@ -63,8 +69,6 @@ let raleighStopsInDarkRollUp = d3.rollup(
 );
 ```
 
-raleighStopsInDarkRollUp
-
 ```js
 raleighStopsInDarkRollUp
 ```
@@ -81,5 +85,10 @@ const raleighStopsInDarkGroup = d3.group(raleighStops,
 ```js
 raleighStopsInDarkGroup
 ```
-
+```js
+const raleighStopsCleaned = raleighStops.map(d => ({
+  ...d,
+  datetime_obj: new Date(d.datetime)
+  }));
+```
 Total between 2011-2015: 323,898
