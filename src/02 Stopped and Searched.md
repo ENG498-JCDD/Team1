@@ -92,7 +92,25 @@ Looking at our data, we can see the traffic stop distribution across racial grou
 **Key observation:** Black drivers represent nearly half (48.8%) of all traffic stops, slightly more than White drivers (40.8%). This establishes our baseline. Now let's investigate whether search rates are proportional to these stop numbers, or if certain groups face disproportionate search rates.
 
 ```js
-// could add a visualization
+// Visualization: Traffic Stops by Race
+Plot.plot({
+  title: `Traffic Stops by Race (2011-2015)`,
+  marginBottom: 60,
+  grid: true,
+  marks: [
+    Plot.barY(
+      stopsByRace,
+      {
+        x: "race",
+        y: "count",
+        fill: "steelblue",
+        tip: true,
+        sort: {x: "-y"}
+      }
+    ),
+    Plot.ruleY([0]),
+  ]
+})
 ```
 
 ## Part 2: Search Rates by Race
