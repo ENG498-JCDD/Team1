@@ -18,7 +18,7 @@ Date-time is a frequency that is locked together, giving us the year, day and mo
 
 ### 4. Rates by Day and Night
 
-Arrests rates by day and night can show us information on if the hypothesis is supported specifically. This can vary and we will have to visualize when this happens since the threshold between sunrise and sunset can differ based on the season. 
+Arrests rates by day and night can show us information on if the hypothesis is supported specifically. This can vary and we will have to visualize when this happens since the threshold between sunrise and sunset can differ based on the season. This will be indicated by hour and by PM or AM.
 
 ## **Let's Begin!**
 
