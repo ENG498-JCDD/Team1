@@ -132,3 +132,45 @@ export const threeLevelRollUpFlatMap = (data, level1Key, level2Key, level3Key, c
   // 3. Return the flattened array
   return flatTotals
 }
+
+
+// Date parsers and formatters for traffic stops data
+const parseDate = utcParse("%Y-%m-%dT%H:%MZ");
+const formatYearNumber = utcFormat("%Y");
+const formatMonthNumber = utcFormat("%m");
+const formatWeekNumber = utcFormat("%U");
+
+export const mapDateObjectForStops = (data, dateString) => {
+  
+  // Use .map() to iterate the data and create new date properties
+  const updatedData = data.map((stop) => {
+    
+    // Create dynamic keys for new properties
+    const objField = dateString + "_obj"
+    const weekField = dateString + "_week"
+    const monthField = dateString + "_month"
+    const yearField = dateString + "_year"
+    
+    // Skip any null datetime values
+    if (stop[dateString] != null) {
+      
+      const dateObj = stop[dateString]
+      
+      // Assign the Date object
+      stop[objField] = dateObj
+      
+      // Extract and assign year, month, week as numbers
+      stop[yearField] = Number(formatYearNumber(dateObj))
+      stop[monthField] = Number(formatMonthNumber(dateObj))
+      stop[weekField] = Number(formatWeekNumber(dateObj))
+    }
+    
+    return stop
+  })
+  
+  const sortedData = updatedData.sort((a, b) => {
+    return ascending(a[dateString + "_obj"], b[dateString + "_obj"])
+  })
+  
+  return sortedData
+}
