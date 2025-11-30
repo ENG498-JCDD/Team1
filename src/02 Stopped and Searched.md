@@ -531,3 +531,53 @@ Plot.plot({
 **Key Observation:** Interestingly, Black drivers show a slightly higher contraband discovery rate (19.3%) compared to White drivers (15.3%). This difference means that when Black drivers are searched , contraband is found approximately 1.3 times more often than when White drivers are searched.
 
 However, this finding requires careful interpretation. While the higher hit rate might initially seem to justify the higher search rates for Black drivers, the disparity remains problematic. Black drivers are searched 2.7 times more frequently than White drivers, yet the contraband discovery rate is only 1.3 times higher. This suggests that the threshold for conducting searches may still be lower for Black drivers, officers may be more willing to search Black drivers on weaker evidence. Additionally, a 4% difference in hit rates does not proportionally justify a 170% increase in search rates (2.7x). If searches were truly evidence-based and unbiased, we would expect the search rate disparity to more closely match the contraband discovery rate disparity.
+
+
+```js
+const stopsWithDateTime = mapDateObjectForStops(raleighStops, "datetime")
+
+// Loop through each stop
+for (const stop of stopsWithDateTime) {
+  const dateObject = new Date(stop.datetime)
+  
+  const hourIn24Format = dateObject.getHours()
+  const minuteValue = dateObject.getMinutes()
+  
+  // Step 1: Convert 24-hour to 12-hour format
+  let hourIn12Format
+  if (hourIn24Format === 0) {
+    hourIn12Format = 12  // Midnight (0) becomes 12 AM
+  }
+  else if (hourIn24Format > 12) {
+    hourIn12Format = hourIn24Format - 12  // 13 becomes 1, 14 becomes 2, etc.
+  }
+  else {
+    hourIn12Format = hourIn24Format  // 1-12 stays the same
+  }
+  
+  // Step 2: Determine AM or PM
+  let periodOfDay
+  if (hourIn24Format >= 12) {
+    periodOfDay = "PM"
+  }
+  else {
+    periodOfDay = "AM"
+  }
+  
+  // Step 3: Add leading zero to minutes if needed
+  let minuteFormatted
+  if (minuteValue < 10) {
+    minuteFormatted = "0" + minuteValue  // 5 becomes "05"
+  }
+  else {
+    minuteFormatted = minuteValue  // 30 stays "30"
+  }
+  
+  // Step 4: Combine into time string
+  stop.time = hourIn12Format + ":" + minuteFormatted + " " + periodOfDay
+}
+```
+```js
+stopsWithDateTime
+```
+
