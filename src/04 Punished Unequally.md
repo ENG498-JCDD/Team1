@@ -31,19 +31,35 @@ raleighStops
 
 Since chapter two *Stopped and Searched* has already outlined the racial compostion of our dataset, I will begin with investigating if the reasons black drivers are getting pulled over are comparable to white ones. This will involve an analysis of the *reason_for_stop* category. 
 
+There are nine reasons for police stops represented in our dataset.
+
+Vehicle Regulatory Violation
+Vehicle Equipment Violation
+Stop Light/Sign Violation
+Seat Belt Violation
+Speed Limit Violation
+Safe Movement Violation
+Driving While Impaired
+Motor Vehicle Violation
+Other Motor Vehicle Violation
+
+Let's first check to see what disparities within races are present for Speed Limit violations, the most represented violation in our dataset.
+
 ```js
+import {oneLevelRollUpFlatMap} from "./utils/utilsH1.js"
+
 const searchesByStops = raleighStops.filter(
-  d => d.reason_for_stop == "TRUE"
+  d => d.reason_for_stop == "Speed Limit Violation"
 )
 
-const searchCountsByRace = oneLevelRollUpFlatMap(
+const searchStopsByRace = oneLevelRollUpFlatMap(
   searchesByStops,
   "race",
   "reason_for_stop"
 )
 ```
 
-```
+
 
 
 
