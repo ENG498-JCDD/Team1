@@ -27,19 +27,24 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 ```js
 raleighStops
 ```
+## Part 1: Reason For Stop
+
+Since chapter two *Stopped and Searched* has already outlined the racial compostion of our dataset, I will begin with investigating if the reasons black drivers are getting pulled over are comparable to white ones. This will involve an analysis of the *reason_for_stop* category. 
 
 ```js
-constStopsRace = d3.rollup(
-  raleighStops,
-  (d) = d.length,
-  (d) = d.race,
+const searchesByStops = raleighStops.filter(
+  d => d.reason_for_stop == "TRUE"
+)
+
+const searchCountsByRace = oneLevelRollUpFlatMap(
+  searchesByStops,
+  "race",
+  "reason_for_stop"
 )
 ```
 
-Interactive output of our dataset counted by length.
-
-```js
-constStopsRace
 ```
+
+
 
 
