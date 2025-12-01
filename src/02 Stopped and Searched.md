@@ -188,6 +188,8 @@ Plot.plot({
 
 This visualization reveals that Black drivers consistently experienced the highest number of stops throughout the entire 2011-2015 period. While both Black and White drivers followed similar trends (declining from 2011 to 2013, then increasing through 2015), the racial disparity between them remained stable across all years.
 
+<!-- Central Tendency and Variability in Racial Stop Patterns -->
+
 ## Part 2: Search Rates by Race
 
 Now let's investigate the key question: Are Black drivers searched at higher rates than White drivers?
@@ -532,8 +534,116 @@ Plot.plot({
 
 However, this finding requires careful interpretation. While the higher hit rate might initially seem to justify the higher search rates for Black drivers, the disparity remains problematic. Black drivers are searched 2.7 times more frequently than White drivers, yet the contraband discovery rate is only 1.3 times higher. This suggests that the threshold for conducting searches may still be lower for Black drivers, officers may be more willing to search Black drivers on weaker evidence. Additionally, a 4% difference in hit rates does not proportionally justify a 170% increase in search rates (2.7x). If searches were truly evidence-based and unbiased, we would expect the search rate disparity to more closely match the contraband discovery rate disparity.
 
+## Part 5: Examining Stop Over Time
+
+So far, we've established that Black drivers face disproportionate stop and search rates. But we haven't yet examined when these stops are happening. Are stops distributed evenly throughout the day? Or are there certain times when disparities are more pronounced?
+
+Understanding the timing of stops helps us identify whether police behavior is consistent, or whether it varies depending on circumstances such as time of day and visibility conditions.
+
+**Extracting Time Information:** First, let's extract the hour from each group to analyze patterns throughout the day. We already have our **stopsWithDates** data with datetime information from our earlier year by year analysis. To analyze stop patterns by hour, we need to extract the hour value from the datetime. We'll create a new array called stopsWithHour that includes all the original stop information plus a new hour property.
 
 ```js
+const stopsWithHour = []
+
+// Loop through each stop and add hour property
+for (const stop of stopsWithDates) {
+  const dateObject = new Date(stop.datetime)
+  const hourIn24Format = dateObject.getHours()
+  
+  // Create a new object with all the properties we need
+  const stopWithHourAdded = {
+    id: stop.id,
+    datetime: stop.datetime,
+    race: stop.race,
+    sex: stop.sex,
+    age: stop.age,
+    search_conducted: stop.search_conducted,
+    search_person: stop.search_person,
+    search_vehicle: stop.search_vehicle,
+    contraband_found: stop.contraband_found,
+    datetime_year: stop.datetime_year,
+    datetime_month: stop.datetime_month,
+    datetime_week: stop.datetime_week,
+    hour: hourIn24Format  // Adding the new hour property
+  }
+  
+  stopsWithHour.push(stopWithHourAdded)
+}
+```
+
+```js
+// Let's check the first stop
+stopsWithHour[0]
+```
+
+Now that we have the hour information for each stop, let's count how many stops occurred during each hour for each racial group. We'll use our twoLevelRollUpFlatMap utility function to group by hour first, then by race:
+
+```js
+const stopsByHourRace = twoLevelRollUpFlatMap(
+  stopsWithHour,
+  "hour",
+  "race",
+  "count"
+) 
+```
+
+<p class="codeblock-caption">
+  Interactive output of stops by <code>hour × race</code>
+</p>
+
+```js
+stopsByHourRace
+```
+This gives us a dataset showing how many stops occured for each race during each hour of the day (0- 23 in 24 hour format). Now we can calculate the central tendency measures (mean, median, mode) for Black and White drivers to understand what a "typical" hour of policing looks like for each group. 
+
+```js
+const blackStopsByHour = stopsByHourRace.filter(
+  d => d.race == "black"
+)
+
+const whiteStopsByHour = stopsByHourRace.filter(
+  d => d.race == "white"
+)
+
+// Calculating central tendency for Black drivers
+const blackMean = d3.mean(blackStopsByHour, d => d.count)
+const blackMedian = d3.median(blackStopsByHour, d => d.count)
+const blackMode = d3.mode(blackStopsByHour, d => d.count)
+
+// Calculating central tendency for White drivers
+const whiteMean = d3.mean(whiteStopsByHour, d => d.count)
+const whiteMedian = d3.median(whiteStopsByHour, d => d.count)
+const whiteMode = d3.mode(whiteStopsByHour, d => d.count)
+```
+
+Central Tendency Results:
+
+For Black Drivers:
+
+Mean stops per hour: ${blackMean.toFixed(2)}
+
+Median stops per hour: ${blackMedian}
+
+Mode (most common): ${blackMode}
+
+For White Drivers:
+
+Mean stops per hour: ${whiteMean.toFixed(2)}
+
+Median stops per hour: ${whiteMedian}
+
+Mode (most common): ${whiteMode}
+
+
+
+
+
+
+
+
+
+
+<!-- ```js
 const stopsWithDateTime = mapDateObjectForStops(raleighStops, "datetime")
 
 for (const stop of stopsWithDateTime) {
@@ -578,4 +688,4 @@ for (const stop of stopsWithDateTime) {
 ```js
 stopsWithDateTime
 ```
-
+ -->
