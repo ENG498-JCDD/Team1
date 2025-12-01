@@ -1,19 +1,25 @@
-# H1: Search Disparities- Frequency Distribution Analysis and Visualization
+```js
+import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops} from "./utils/utilsH1.js";
+```
+
+# Racial Disparities in Traffic Stops and Searches: A Multi-Dimensional Analysis of Raleigh, NC (2011-2015)
+
 
 ## Overview
 
-In this chapter, we investigate whether Black drivers experience discriminatory search practices during traffic stops. We will examine:
+In this chapter, we investigate whether Black drivers experience discriminatory practices during traffic stops in Raleigh, NC. We will examine:
 
-1. **Search patterns by race** - Are black drivers searched more often?
-2. **Types of searches** - Do disparities exist in both person searches and vehicle searches?
-3. **Gender-specific patterns** - Do racial disparities persist even among women drivers, who are stereotypically considered "safer"?
-4. **Contraband discovery rates** - When searches occur, is contraband actually found? Do discovery rates justify the search rate disparities?
+1. **Stop patterns by race** - Are Black drivers stopped more often than other racial groups, and is this pattern consistent over time?
+2. **Search patterns by race** - Are Black drivers searched more often?
+3. **Types of searches** - Do disparities exist in both person searches and vehicle searches?
+4. **Gender-specific patterns** - Do racial disparities persist even among women drivers, who are stereotypically considered "safer"?
+5. **Contraband discovery rates** - When searches occur, is contraband actually found? Do discovery rates justify the search rate disparities?
 
-**Our hypothesis:** If Black drivers are searched more frequently but contraband is found at similar or lower rates, this indicates racial profiling rather than evidence-based policing. However, we must also consider whether higher contraband discovery rates proportionally justify higher search rates.
+**Our hypothesis:** If Black drivers are both stopped and searched more frequently, but contraband is found at similar or lower rates, this indicates racial profiling rather than evidence-based policing. However, we must also consider whether higher contraband discovery rates proportionally justify higher search rates.
 
 ## Research Question
 
-**Do Black drivers experience disproportionate search rates compared to White drivers, and if so, are these disparities justified by contraband discovery patterns?**
+**Do Black drivers experience disproportionate stop rates and search rates compared to White drivers, and if so, are these disparities justified by contraband discovery patterns?**
 
 Let's explore the data to find out.
 
@@ -59,8 +65,6 @@ stopsByRaceMap
 This gives us a Map structure showing the count for each racial group. For easier analysis and visualization, let's convert this into a cleaner array format:
 
 ```js
-import {oneLevelRollUpFlatMap} from "./utils/utilsH1.js";
-
 const stopsByRace = oneLevelRollUpFlatMap(
   raleighStops,
   "race",
@@ -89,15 +93,106 @@ Looking at our data, we can see the traffic stop distribution across racial grou
 
 **Total stops:** 330,967
 
-**Key observation:** Black drivers represent nearly half (48.8%) of all traffic stops, slightly more than White drivers (40.8%). This establishes our baseline. Now let's investigate whether search rates are proportional to these stop numbers, or if certain groups face disproportionate search rates.
+**Key observation:** Black drivers represent nearly half (48.8%) of all traffic stops, slightly more than White drivers (40.8%). This establishes our baseline. 
 
 ```js
-// could add a visualization
+// Visualization: Traffic Stops by Race
+Plot.plot({
+  grid: true,
+  marginLeft: 100,
+  marginRight: 0,
+  marginBottom: 60,
+  marginTop: 60,
+  label: null,
+  color: {legend: true},
+  x: {label: "Race", padding: 0},
+  y: {label: "Absolute Frequency", padding: 0},
+  marks: [
+    Plot.ruleY([0]),
+    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
+    Plot.barY(
+      stopsByRace,
+      {
+        x: "race",
+        y: "count",
+        sort: {x: "-y"},
+        insetRight: 10,
+        insetLeft: 10,
+        tip: true,
+      }
+    )
+  ]
+})
 ```
+**Is This Pattern Consistent Over Time?**
+
+Now that we see the overall distribution, an important question remains: Is this disparity a recent development, or has it been consistent throughout the 2011-2015 period? Let's examine the year-by-year trends.
+
+```js
+const stopsWithDates = mapDateObjectForStops(raleighStops, "datetime")
+
+const stops2011to2015 = stopsWithDates.filter(
+  d => d.datetime_year >= 2011 && d.datetime_year <= 2015
+)
+
+const stopsByYearRace = twoLevelRollUpFlatMap(
+  stops2011to2015,
+  "datetime_year",
+  "race",
+  "count"
+)
+
+const stopsByYearRaceString = []
+
+for (const row of stopsByYearRace) {
+  stopsByYearRaceString.push({
+    datetime_year: String(row.datetime_year),  
+    race: row.race,
+    count: row.count
+  })
+}
+```
+
+```js
+Plot.plot({
+  marginLeft: 80,
+  marginBottom: 60,
+  grid: true,
+  
+  y: {
+    label: "Count (n)",
+    grid: true
+  },
+  
+  x: {
+    label: "Year"
+  },
+  
+  color: {
+    legend: true
+  },
+  
+  marks: [
+    Plot.lineY(stopsByYearRaceString, {
+      x: "datetime_year",
+      y: "count",
+      stroke: "race",
+      marker: "circle",
+      tip: true
+    }),
+    
+    Plot.ruleY([0])
+  ]
+})
+```
+
+This visualization reveals that Black drivers consistently experienced the highest number of stops throughout the entire 2011-2015 period. While both Black and White drivers followed similar trends (declining from 2011 to 2013, then increasing through 2015), the racial disparity between them remained stable across all years.
 
 ## Part 2: Search Rates by Race
 
 Now let's investigate the key question: Are Black drivers searched at higher rates than White drivers?
+
+Here's why this matters: Being stopped more often is one thing. But if Black drivers are also being searched at disproportionate rates once they're stopped, that's a whole different level of disparity. Let's find out.
 
 ### Overall Search Counts
 
@@ -123,7 +218,7 @@ const searchCountsByRace = oneLevelRollUpFlatMap(
 searchCountsByRace
 ```
 
-**Initial Observation:** Black drivers experienced nearly 2.7 times more searches than White drivers, despite representing only a slightly larger portion of total stops. This suggests a potential disparity in search practices.
+**Initial Observation:** Black drivers experienced nearly 2.7 times more searches than White drivers. Black drivers make up 48.8% of stops (only 8 percentage points more than White drivers' 40.8%), but they're searched 2.7 times more often. That's a huge disparity that goes way beyond the baseline stop numbers.
 
 ### Breaking Down Search Types
 
@@ -137,29 +232,6 @@ There are two types of searches officers can conduct:
 ### Person Search counts
 
 ```js
-// only for person search
-// consider applying 2levelrollup
-// rather han doing this way consider this way race > search person (true, false) > search count
-// const personSearches = raleighStops.filter(
-//   d => d.search_person == "TRUE"
-// )
-
-// const personSearchByRace = oneLevelRollUpFlatMap(
-//   personSearches,
-//   "race",
-//   "person_search_count"
-// )
-// ```
-// <p class="codeblock-caption">
-//   Interactive output of Raleigh traffic stops <code>by race and person search</code>
-// </p>
-
-// ```js
-// personSearchByRace
-// // can add a visualization here
-
-import {twoLevelRollUpFlatMap} from "./utils/utilsH1.js";
-
 const racePersonSearch = twoLevelRollUpFlatMap(
   raleighStops,
   "race",
@@ -175,7 +247,7 @@ const racePersonSearch = twoLevelRollUpFlatMap(
 racePersonSearch
 ```
 
-**Key Observation:** Black drivers experienced 2.7 times more person searches than white drivers. This is nearly identitical to the overall search disparity, showing that racial disparity is not limited to one type of search.
+**Key Observation:** Black drivers experienced 2.7 times more person searches than white drivers. This is identitical to the overall search disparity, showing that racial disparity is not limited to one type of search.
 
 Person searches are particularly invasive as they involve physically searching the driver's body. The fact that Black drivers face this more intrusive search at such a disproportionate rate raises serious concerns about discriminatory enforcement practices.
 
@@ -184,25 +256,6 @@ Person searches are particularly invasive as they involve physically searching t
 Let's now examine vehicles searches to see if the same pattern holds.
 
 ```js
-// follow same thing as previous one. 2 levelrollup
-// const vehicleSearches = raleighStops.filter(
-//   d => d.search_vehicle == "TRUE"
-// )
-
-// const vehicleSearchByRace = oneLevelRollUpFlatMap(
-//   vehicleSearches,
-//   "race",
-//   "vehicle_search_count"
-// )
-// ```
-
-// <p class="codeblock-caption">
-//   Interactive output of Raleigh traffic stops <code>by race and vehicle search</code>
-// </p>
-
-// ```js
-// vehicleSearchByRace
-
 const raceVehicleSearch = twoLevelRollUpFlatMap(
   raleighStops,
   "race",
@@ -238,10 +291,6 @@ Women are often stereotyped as "safer" or "more cautious" drivers. If racial dis
 ### Three-Level Analysis: Race > Gender > Search Status
 
 Let's do a comprehensive three-level rollup to examine race, gender, and search patterns simultaneously:
-
-```js
-import {threeLevelRollUpFlatMap} from "./utils/utilsH1.js";
-```
 
 ```js
 // Filter for women drivers only
@@ -283,9 +332,8 @@ The logic behind this is if searches are based on legitimate evidence, then high
 Now, we need to examine the contraband discovery patterns, and to do this effectively, we'll use a three level rollup that groups our data by race, search conducted, and contraband found. This will allow us to see, for each racial group, how many searches were conducted and how many of those searches actually resulted in finding contraband. 
 
 ```js
-
 const stopsWithContrabandData = raleighStops.filter(
-  d => d.contraband_found !== "NA"
+  d => d.contraband_found != "NA"
 )
 
 const raceSearchContraband = threeLevelRollUpFlatMap(
@@ -303,8 +351,231 @@ const raceSearchContraband = threeLevelRollUpFlatMap(
 
 ```js
 raceSearchContraband
-// present the finding with visualization
 ```
+
+#### Visualizing Hit Rates
+
+Let's examine the contraband discovery rates visually to better understand the disparity between Black and White drivers.
+
+```js
+// present the finding with visualization
+// write reducer function
+/**
+ * Reducer function for contraband FOUND
+ * Returns count if contraband was found, else 0
+**/
+const contrabandFoundReducer = (d) => {
+  if (d.contraband_found == "TRUE" && d.search_conducted == "TRUE") {
+    return d.count
+  }
+  else {
+    return 0
+  }
+}
+
+/**
+ * Reducer function for contraband NOT FOUND
+ * Returns count if contraband was NOT found, else 0
+**/
+const contrabandNotFoundReducer = (d) => {
+  if (d.contraband_found == "FALSE" && d.search_conducted == "TRUE") {
+    return d.count
+  }
+  else {
+    return 0
+  }
+}
+```
+
+```js
+// Reducer properties & objectify reducerFuncs
+const reducerProps = [
+  "black",
+  "white"
+]
+
+const reducerFuncs = [
+  {
+    type: "FOUND",
+    func: contrabandFoundReducer
+  },
+  {
+    type: "NOT_FOUND",
+    func: contrabandNotFoundReducer
+  }
+]
+
+const uniqueRaceList = getUniquePropListBy(
+  raceSearchContraband,
+  "race"
+)
+```
+
+```js
+// 1. Create array for results
+const contrabandPercResults = []
+
+/**
+ * 2. Loop through RACE values
+**/
+for (const raceValue of reducerProps) {
+
+  // 3. Loop through reducer functions
+  for (const testorObj in reducerFuncs) {
+
+    const totalSearchesForRace = d3.sum(
+      raceSearchContraband,
+      (d) => {
+        if (d.race == raceValue && d.search_conducted == "TRUE") {
+          return d.count
+        }
+      }
+    )
+
+    /**
+     * Calculate the sum for FOUND or NOT_FOUND
+     * using the reducer function
+    **/
+
+    const summedUpLevel = d3.sum(
+      raceSearchContraband,
+      (d) => {
+        if (d.race == raceValue && d.search_conducted == "TRUE") {
+          const xTotalToSum = reducerFuncs[testorObj]["func"](d)
+          return xTotalToSum
+        }
+      }
+    )
+
+    // Push results
+    contrabandPercResults.push({
+      race: raceValue,
+      contraband_status: reducerFuncs[testorObj]["type"],
+      count: summedUpLevel,
+      total_searches: totalSearchesForRace,
+      percentage: summedUpLevel / totalSearchesForRace,
+    })
+  }
+}
+```
+
+```js
+// Filter the data for plotting
+// Filter for contraband FOUND only
+const blackFound = contrabandPercResults.filter(
+  (d) => {
+    if (d.race == "black" && d.contraband_status == "FOUND") {
+      return true
+    }
+  }
+)
+
+const whiteFound = contrabandPercResults.filter(
+  (d) => {
+    if (d.race == "white" && d.contraband_status == "FOUND") {
+      return true
+    }
+  }
+)
+```
+
+```js
+// Step 6: Plot with Plot.barY()
+Plot.plot({
+  height: 400,
+  marginLeft: 50,
+  marginRight: 100,
+  marginBottom: 40,
+  marginTop: 50,
+  grid: true,
+  
+  x: {
+    label: "RACE", padding: 0
+  },
+  
+  y: {
+    label: "Contraband Discovery Rate", padding: 0,
+    percent: true
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    Plot.barY(
+      blackFound,
+      {
+        x: "race",
+        y: "percentage",
+        fill: "Black",
+        tip: true,
+        insetLeft: 80,
+        insetRight: 80
+      }
+    ),
+    
+    Plot.barY(
+      whiteFound,
+      {
+        x: "race",
+        y: "percentage",
+        fill: "red",
+        tip: true,
+        insetLeft: 80,
+        insetRight: 80
+      }
+    )
+  ]
+})
+```
+
 **Key Observation:** Interestingly, Black drivers show a slightly higher contraband discovery rate (19.3%) compared to White drivers (15.3%). This difference means that when Black drivers are searched , contraband is found approximately 1.3 times more often than when White drivers are searched.
 
 However, this finding requires careful interpretation. While the higher hit rate might initially seem to justify the higher search rates for Black drivers, the disparity remains problematic. Black drivers are searched 2.7 times more frequently than White drivers, yet the contraband discovery rate is only 1.3 times higher. This suggests that the threshold for conducting searches may still be lower for Black drivers, officers may be more willing to search Black drivers on weaker evidence. Additionally, a 4% difference in hit rates does not proportionally justify a 170% increase in search rates (2.7x). If searches were truly evidence-based and unbiased, we would expect the search rate disparity to more closely match the contraband discovery rate disparity.
+
+
+```js
+const stopsWithDateTime = mapDateObjectForStops(raleighStops, "datetime")
+
+for (const stop of stopsWithDateTime) {
+  const dateObject = new Date(stop.datetime)
+  
+  const hourIn24Format = dateObject.getHours()
+  const minuteValue = dateObject.getMinutes()
+  
+  let hourIn12Format
+  if (hourIn24Format === 0) {
+    hourIn12Format = 12  // Midnight (0) becomes 12 AM
+  }
+  else if (hourIn24Format > 12) {
+    hourIn12Format = hourIn24Format - 12  // 13 becomes 1, 14 becomes 2, etc.
+  }
+  else {
+    hourIn12Format = hourIn24Format  // 1-12 stays the same
+  }
+  
+  // Step 2: Determine AM or PM
+  let periodOfDay
+  if (hourIn24Format >= 12) {
+    periodOfDay = "PM"
+  }
+  else {
+    periodOfDay = "AM"
+  }
+  
+  // Step 3: Add leading zero to minutes if needed
+  let minuteFormatted
+  if (minuteValue < 10) {
+    minuteFormatted = "0" + minuteValue  // 5 becomes "05"
+  }
+  else {
+    minuteFormatted = minuteValue  // 30 stays "30"
+  }
+  
+  // Step 4: Combine into time string
+  stop.time = hourIn12Format + ":" + minuteFormatted + " " + periodOfDay
+}
+```
+```js
+stopsWithDateTime
+```
+
