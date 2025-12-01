@@ -536,14 +536,12 @@ However, this finding requires careful interpretation. While the higher hit rate
 ```js
 const stopsWithDateTime = mapDateObjectForStops(raleighStops, "datetime")
 
-// Loop through each stop
 for (const stop of stopsWithDateTime) {
   const dateObject = new Date(stop.datetime)
   
   const hourIn24Format = dateObject.getHours()
   const minuteValue = dateObject.getMinutes()
   
-  // Step 1: Convert 24-hour to 12-hour format
   let hourIn12Format
   if (hourIn24Format === 0) {
     hourIn12Format = 12  // Midnight (0) becomes 12 AM
