@@ -38,6 +38,332 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 ```js
 raleighStops
 ```
+## Part 1: Understanding Our Dataset by Race
+
+Before we look at searches, let's understand the basic components of our dataset. Which racial groups are represented in our traffic stop data, and how frequently was each group stopped?
+
+### Counting Stops by Race
+
+Let's start by exploring the racial distribution of traffic stops:
+```js
+const stopsByRace = oneLevelRollUpFlatMap(
+  raleighStops,
+  "race",
+  "count"
+)
+```
+```js
+// Calculate total stops and add percentages
+const totalStops = d3.sum(stopsByRace, d => d.count)
+
+const stopsByRaceWithPercent = []
+
+for (const row of stopsByRace) {
+  const percentage = (row.count / totalStops) * 100
+  
+  stopsByRaceWithPercent.push({
+    race: row.race,
+    count: row.count,
+    percentage: percentage
+  })
+}
+```
+```js
+// Raleigh, NC Population by Race (2006-2010 ACS 5-Year Estimates)
+// Source: U.S. Census Bureau, Table DP05
+// Link: https://data.census.gov/table/ACSDP5Y2010.DP05?q=Raleigh+city,+North+Carolina
+const raleighPopulationByRace = [
+  {race: "white", population: 225705, percentage: 59.0},
+  {race: "black", population: 112948, percentage: 29.5},
+  {race: "asian/pacific islander", population: 16879, percentage: 4.4},
+  {race: "hispanic", population: 20371, percentage: 5.3},
+  {race: "other", population: 5656, percentage: 1.5}
+]
+```
+
+### Distribution of Traffic Stops by Race (2011-2015)
+
+Looking at our data, we can see the traffic stop distribution across racial groups:
+
+- **Black drivers:** 161,437 stops (48.8%)
+- **White drivers:** 134,949 stops (40.8%)
+- **Hispanic drivers:** 30,146 stops (9.1%)
+- **Asian/Pacific Islander:** 6,712 stops (2.0%)
+- **Unknown:** 3,648 stops (1.1%)
+- **Other:** 175 stops (0.1%)
+
+**Total stops:** 330,967
+```js
+Plot.plot({
+  title: "Traffic Stops by Race in Raleigh, NC (2011-2015)",
+  width: 1000,
+  height: 600,
+  marginLeft: 150,
+  marginBottom: 80,
+  marginTop: 60,
+  grid: true,
+  
+  x: {
+    label: "Race",
+    padding: 0.1
+  },
+  
+  y: {
+    label: "Number of Stops",
+    grid: true
+  },
+  
+  color: {
+    legend: true,
+    scheme: "tableau10"
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    Plot.barY(stopsByRaceWithPercent, {
+      x: "race",
+      y: "count",
+      fill: "race",
+      sort: {x: "-y"},
+      tip: true
+    }),
+    
+    Plot.text(stopsByRaceWithPercent, {
+      x: "race",
+      y: "count",
+      text: d => `${d.percentage.toFixed(1)}%`,
+      dy: -10,
+      fontSize: 14,
+      fontWeight: "bold"
+    })
+  ]
+})
+```
+
+### Comparing Population vs. Traffic Stops: A Critical Disparity
+
+Before we interpret these stop patterns, we need to understand Raleigh's demographics. If stops were proportional to population, we would expect each racial group's percentage of stops to match their percentage of the population. Let's compare the actual population distribution with the traffic stop distribution:
+
+**Raleigh Population by Race (2006-2010)**
+```js
+Plot.plot({
+  title: "Raleigh Population by Race (2006-2010)",
+  width: 900,
+  height: 500,
+  marginLeft: 150,
+  marginBottom: 80,
+  grid: true,
+  
+  x: {
+    label: "Race",
+    padding: 0.1
+  },
+  
+  y: {
+    label: "Percentage of Population",
+    domain: [0, 65],
+    grid: true
+  },
+  
+  color: {
+    legend: true,
+    scheme: "tableau10"
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    Plot.barY(raleighPopulationByRace, {
+      x: "race",
+      y: "percentage",
+      fill: "race",
+      sort: {x: "-y"},
+      tip: true
+    }),
+    
+    Plot.text(raleighPopulationByRace, {
+      x: "race",
+      y: "percentage",
+      text: d => `${d.percentage.toFixed(1)}%`,
+      dy: -10,
+      fontSize: 14,
+      fontWeight: "bold"
+    })
+  ]
+})
+```
+
+**Traffic Stops by Race (2011-2015)**
+```js
+Plot.plot({
+  title: "Traffic Stops by Race (2011-2015)",
+  width: 900,
+  height: 500,
+  marginLeft: 150,
+  marginBottom: 80,
+  grid: true,
+  
+  x: {
+    label: "Race",
+    padding: 0.1
+  },
+  
+  y: {
+    label: "Percentage of Stops",
+    domain: [0, 65],
+    grid: true
+  },
+  
+  color: {
+    legend: true,
+    scheme: "tableau10"
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    Plot.barY(stopsByRaceWithPercent, {
+      x: "race",
+      y: "percentage",
+      fill: "race",
+      sort: {x: "-y"},
+      tip: true
+    }),
+    
+    Plot.text(stopsByRaceWithPercent, {
+      x: "race",
+      y: "percentage",
+      text: d => `${d.percentage.toFixed(1)}%`,
+      dy: -10,
+      fontSize: 14,
+      fontWeight: "bold"
+    })
+  ]
+})
+```
+
+**Critical Finding:** This comparison reveals a stark disparity:
+
+- **White drivers** make up **59.0% of Raleigh's population** but only **40.8% of traffic stops** — under-represented by **18.2 percentage points**
+- **Black drivers** make up **29.5% of Raleigh's population** but **48.8% of traffic stops** — over-represented by **19.3 percentage points**
+
+This means Black drivers are stopped at a rate **1.65 times higher** than their population share would predict, while White drivers are stopped at a rate **0.69 times lower** than expected. This disparity cannot be explained by population differences alone and suggests potential racial bias in policing practices.
+
+### Is This Pattern Consistent Over Time?
+
+Now that we've established the overall disparity, an important question remains: Is this a recent development, or has it been consistent throughout the 2011-2015 period? Let's examine the year-by-year trends.
+```js
+const stopsWithDates = mapDateObjectForStops(raleighStops, "datetime")
+
+const stops2011to2015 = stopsWithDates.filter(
+  d => d.datetime_year >= 2011 && d.datetime_year <= 2015
+)
+
+const stopsByYearRace = twoLevelRollUpFlatMap(
+  stops2011to2015,
+  "datetime_year",
+  "race",
+  "count"
+)
+
+const stopsByYearRaceString = []
+
+for (const row of stopsByYearRace) {
+  stopsByYearRaceString.push({
+    datetime_year: String(row.datetime_year),  
+    race: row.race,
+    count: row.count
+  })
+}
+```
+```js
+Plot.plot({
+  title: "Traffic Stops by Race Over Time (2011-2015)",
+  width: 1000,
+  height: 500,
+  marginLeft: 80,
+  marginBottom: 60,
+  grid: true,
+  
+  x: {
+    label: "Year"
+  },
+  
+  y: {
+    label: "Number of Stops",
+    grid: true
+  },
+  
+  color: {
+    legend: true,
+    scheme: "category10"
+  },
+  
+  marks: [
+    Plot.lineY(stopsByYearRaceString, {
+      x: "datetime_year",
+      y: "count",
+      stroke: "race",
+      strokeWidth: 3,
+      marker: "circle",
+      tip: true
+    }),
+    
+    Plot.ruleY([0])
+  ]
+})
+```
+
+This visualization reveals that Black drivers consistently experienced the highest number of stops throughout the entire 2011-2015 period. While both Black and White drivers followed similar trends (declining from 2011 to 2013, then increasing through 2015), the racial disparity between them remained stable across all years.
+
+## Data Sources
+
+**Traffic Stop Data:**
+- Stanford Open Policing Project. (2020). Raleigh, NC Police Department Traffic Stop Data (2011-2015). Retrieved from https://openpolicing.stanford.edu/
+
+**Population Demographics:**
+- U.S. Census Bureau. (2010). American Community Survey 5-Year Estimates (2006-2010), Table DP05: ACS Demographic and Housing Estimates. Raleigh city, North Carolina. Retrieved from https://data.census.gov/table/ACSDP5Y2010.DP05?q=Raleigh+city,+North+Carolina
+
+**Note:** The ACS 2006-2010 5-Year Estimates provide the most reliable demographic baseline for our 2011-2015 traffic stop analysis period, as they represent averaged data immediately preceding our study period.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
+
+
 
 ## Part 1: Understanding Our Dataset by Race
 
@@ -190,7 +516,7 @@ This visualization reveals that Black drivers consistently experienced the highe
 
 <!-- Central Tendency and Variability in Racial Stop Patterns -->
 
-## Part 2: Search Rates by Race
+<!-- ## Part 2: Search Rates by Race
 
 Now let's investigate the key question: Are Black drivers searched at higher rates than White drivers?
 
@@ -643,7 +969,7 @@ Mode (most common): ${whiteMode}
 
 
 
-<!-- ```js
+```js
 const stopsWithDateTime = mapDateObjectForStops(raleighStops, "datetime")
 
 for (const stop of stopsWithDateTime) {
@@ -687,5 +1013,4 @@ for (const stop of stopsWithDateTime) {
 ```
 ```js
 stopsWithDateTime
-```
- -->
+``` --> -->
