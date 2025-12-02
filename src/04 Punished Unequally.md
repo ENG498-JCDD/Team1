@@ -1,10 +1,12 @@
 # H3: Punished Unequally: An Outcomes Based Analysis
-
+```js
+import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops} from "./utils/utilsH1.js";
+```
 ## Overview
 
-It has been theorized that, in many instances, black drivers recieve harsher outcomes than white drivers for similar or identical violations at traffic stops. In *Suspect Citizens: What 20 Million Traffic Stops Tell Us About Policing and Race*, Baumgartner et. al extend this theory to North Carolina. Through a comprehensive study of over 20 million traffic stops, the authors find unassailable evidence of racial bias in routine police-citizen interation.
+This chapter provides an in-depth analysis of the outcomes black and white driver's face for traffic stops. It analyzes officer's reason for stopping drivers in conjunction with citations issued, and looks to uncover distinct patterns in the penalties driver's may face for getting pulled over.
 
-This chapter builds on this finding by applying a similar method of analysis at a more granular level. The previous chapter's have already checked the correlation between race and contraband found between stopped persons. The inclusion of the *reason_for_search* category in this rollup is included to see what correlation, or lack thereof, might be present with motive behind officer stops.
+This involves three variables in our dataset: race, reason_for_stop, and citation.
 
 **Hypothesis**
 
@@ -31,24 +33,36 @@ raleighStops
 
 Since chapter two *Stopped and Searched* has already outlined the racial compostion of our dataset, I will begin with investigating if the reasons black drivers are getting pulled over are comparable to white ones. This will involve an analysis of the *reason_for_stop* category. 
 
-There are nine reasons for police stops represented in our dataset.
+There are ten reasons for police stops represented in our dataset.
 
-Vehicle Regulatory Violation
-Vehicle Equipment Violation
-Stop Light/Sign Violation
-Seat Belt Violation
-Speed Limit Violation
-Safe Movement Violation
-Driving While Impaired
-Motor Vehicle Violation
-Other Motor Vehicle Violation
+1. Vehicle Regulatory Violation
+2. Vehicle Equipment Violation
+3. Stop Light/Sign Violation
+4. Seat Belt Violation
+5. Speed Limit Violation
+6. Safe Movement Violation
+7. Driving While Impaired
+8. Motor Vehicle Violation
+9. Other Motor Vehicle Violation
+10. Checkpoint
 
 Let's first check the frequency of each stop by race in our dataset.
-```js
 
+```js
+const afRaceByReason = d3.rollups(
+  raleighStops,
+  v => v.length,
+    d => d.race,
+    d => d.reason_for_stop
+).flatMap(([race, reasons]) =>
+  reasons.map(([reason_for_stop, count]) => ({race, reason_for_stop, count}))
+)
+//oneLevelRollUpFlatMap was producing different plot
 ```
 ```js
 Plot.plot({
+  title: "Reason for Stop Racial Breakdown",
+  width: 1100,
   grid: true,
   marginLeft: 100,
   marginRight: 0,
@@ -56,75 +70,31 @@ Plot.plot({
   marginTop: 60,
   label: null,
   color: {legend: true},
-  x: {label: "Race", padding: 0},
+  x: {label: "Reason for Stop", padding: 0},
   y: {label: "Absolute Frequency", padding: 0},
   marks: [
     Plot.ruleY([0]),
     Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
     Plot.barY(
-      stopsByReason,
+      afRaceByReason
+       ,
       {
-        x: "reasonForStop",
+        x: "reason_for_stop",
         y: "count",
+        fill: "race",
         sort: {x: "-y"},
         insetRight: 10,
         insetLeft: 10,
         tip: true,
+        color: {
+    domain: ["White", "Black", "Hispanic", "Asian"],
+    range: ["red", "blue", "green", "black"]
       }
-    )
+    })
   ]
 })
 ```
-```js
-// Plot.plot({
-//   width: 1500,
-//   height: 600,
-//   title: "Race by Reason for Stop (Absolute Counts)",
-//   x: {label: "Count"},
-//   y: {label: "Reason for Stop"},
-//   grid: true,
-//   marks: [
-//     Plot.barX(
-//       raleighStops,
-//       Plot.groupY({x: "count", fill: "race"}, {y: "reason_for_stop"})
-//     ),
-//     Plot.ruleX([0])
-//   ]
-// })
-// ```
-// ```js
-// Plot.plot({
-//   width: 1500,
-//   marks: [
-//     Plot.barY(raleighStops, { 
-//       x: "reason_for_stop",
-//       y: "race",
-//       fill: "race", 
-//       sort: { x: "-y" } 
-//     })
-//   ]
-// })
-```
 
-
-
-
-
-Let's first check to see what disparities within races are present for Speed Limit violations, the most represented violation in our dataset.
-
-```js
-import {oneLevelRollUpFlatMap} from "./utils/utilsH1.js"
-
-const searchesByStops = raleighStops.filter(
-  d => d.reason_for_stop == "Speed Limit Violation"
-)
-
-const searchStopsByRace = oneLevelRollUpFlatMap(
-  searchesByStops,
-  "race",
-  "reason_for_stop"
-)
-```
 
 
 
