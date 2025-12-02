@@ -44,36 +44,66 @@ Motor Vehicle Violation
 Other Motor Vehicle Violation
 
 Let's first check the frequency of each stop by race in our dataset.
+```js
 
+```
 ```js
 Plot.plot({
-  width: 1500,
-  height: 600,
-  title: "Race by Reason for Stop (Absolute Counts)",
-  x: {label: "Count"},
-  y: {label: "Reason for Stop"},
   grid: true,
+  marginLeft: 100,
+  marginRight: 0,
+  marginBottom: 60,
+  marginTop: 60,
+  label: null,
+  color: {legend: true},
+  x: {label: "Race", padding: 0},
+  y: {label: "Absolute Frequency", padding: 0},
   marks: [
-    Plot.barX(
-      raleighStops,
-      Plot.groupY({x: "count", fill: "race"}, {y: "reason_for_stop"})
-    ),
-    Plot.ruleX([0])
+    Plot.ruleY([0]),
+    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
+    Plot.barY(
+      stopsByReason,
+      {
+        x: "reasonForStop",
+        y: "count",
+        sort: {x: "-y"},
+        insetRight: 10,
+        insetLeft: 10,
+        tip: true,
+      }
+    )
   ]
 })
 ```
 ```js
-Plot.plot({
-  width: 1500,
-  marks: [
-    Plot.barY(raleighStops, { 
-      x: "reason_for_stop",
-      y: "race",
-      fill: "race", 
-      sort: { x: "-y" } 
-    })
-  ]
-})
+// Plot.plot({
+//   width: 1500,
+//   height: 600,
+//   title: "Race by Reason for Stop (Absolute Counts)",
+//   x: {label: "Count"},
+//   y: {label: "Reason for Stop"},
+//   grid: true,
+//   marks: [
+//     Plot.barX(
+//       raleighStops,
+//       Plot.groupY({x: "count", fill: "race"}, {y: "reason_for_stop"})
+//     ),
+//     Plot.ruleX([0])
+//   ]
+// })
+// ```
+// ```js
+// Plot.plot({
+//   width: 1500,
+//   marks: [
+//     Plot.barY(raleighStops, { 
+//       x: "reason_for_stop",
+//       y: "race",
+//       fill: "race", 
+//       sort: { x: "-y" } 
+//     })
+//   ]
+// })
 ```
 
 
