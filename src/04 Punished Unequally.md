@@ -43,6 +43,43 @@ Driving While Impaired
 Motor Vehicle Violation
 Other Motor Vehicle Violation
 
+Let's first check the frequency of each stop by race in our dataset.
+
+```js
+Plot.plot({
+  width: 1500,
+  height: 600,
+  title: "Race by Reason for Stop (Absolute Counts)",
+  x: {label: "Count"},
+  y: {label: "Reason for Stop"},
+  grid: true,
+  marks: [
+    Plot.barX(
+      raleighStops,
+      Plot.groupY({x: "count", fill: "race"}, {y: "reason_for_stop"})
+    ),
+    Plot.ruleX([0])
+  ]
+})
+```
+```js
+Plot.plot({
+  width: 1500,
+  marks: [
+    Plot.barY(raleighStops, { 
+      x: "reason_for_stop",
+      y: "race",
+      fill: "race", 
+      sort: { x: "-y" } 
+    })
+  ]
+})
+```
+
+
+
+
+
 Let's first check to see what disparities within races are present for Speed Limit violations, the most represented violation in our dataset.
 
 ```js
