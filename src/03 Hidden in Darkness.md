@@ -1,4 +1,9 @@
 # Hidden in Darkness
+
+```js
+import {twoLevelRollUpFlatMap} from "./utils/utilsH1.js"
+```
+
 ### *Overview*
 An analysis on the frequencies of race and datetime for the traffic stops of Raleigh from 2011-2015. This hypothesis is centered around comparing how the date and time relate to traffic stops made, and then applying that to a racialized lens.
 
@@ -76,8 +81,7 @@ function fourLevelRollUpFlatMapTime(data, countKey) {
 const raleighStops = await FileAttachment("./data/policestops-with-townships.csv").csv({typed: true});
 const cleaned = cleanStops(raleighStops);
 const rolled = fourLevelRollUpFlatMapTime(cleaned, "count");
-
-rolled
+const stopsByHour = twoLevelRollUpFlatMap(cleaned, "race", "hour", "af")
 ```
 
 ```js
@@ -85,7 +89,29 @@ cleaned
 ```
 
 ```js
-rolled
+const sortedStopsByHour = stopsByHour.sort(
+  (a,b) => d3.ascending(a.hour, b.hour)
+)
+```
+
+```js
+sortedStopsByHour
+```
+
+```js
+Plot.plot({
+  marks: [
+    Plot.line(
+      sortedStopsByHour,
+      {
+        x: "hour",
+        y: "af",
+        stroke: "race",
+        tip: true,
+      }
+    )
+  ]
+})
 ```
 
 The above shows 2 things; the first Array list shows all of our data grouped up with some extra groupings I ended up coding to cut to the chase. The second Array list shows just that.
