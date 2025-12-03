@@ -29,6 +29,62 @@ const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv
 ```js
 raleighStops
 ```
+
+## Normalizing The Data
+Before we begin, let's normalize our data based on population. As of the most recent census data, whites accounted for 59.1 percent of Raleigh's total population and the black population represented only 21.9 percent. Let's adjust our data to reflect this, by mapping racial categories to population ratios and then outputting the data grouped by race with normalized frequencies.
+
+```js
+const raleighPop = 131023
+const raleighPopRatios = new Map([
+  ["white", 0.591*raleighPop],
+  ["black", 0.219*raleighPop],
+  ["hispanic", 0.096*raleighPop],
+  ["native", 0.003*raleighPop],
+  ["asian/pacific islander", 0.044*raleighPop],
+  ["unknown", null],
+])
+```
+```js
+const raleighStopsByRace = d3.rollups(
+  ncPoliceStops,
+  (leaves) => {
+    /** Adjust for population
+     *  If .race is not the unknown category, use formula.
+    **/
+    if (leaves[0].race != "unknown") {
+      return {
+        race: leaves[0].race,
+        stopFreq: leaves.length,
+        // Use the normalizing formula and mapped ratio value by race
+        normalizedStopFreq: leaves.length / raleighPopRatios.get(leaves[0].race),
+      }
+    }
+    else {
+      return {
+        race: leaves[0].race,
+        stopFreq: leaves.length,
+        // We can't account for the "unknown" race value in the data,
+        // so set it to null.
+        normalizedStopFreq: null,
+      }
+    }
+  },
+  (d) => d.race,
+)
+
+// Flatten the rolledup Map
+const flatStopsByRace = raleighStopsByRace.flatMap(
+  ([race, racesList]) => {
+    return racesList
+  }
+)
+```
+
+```js
+
+```
+
+
 ## Part 1: Reason For Stop
 
 Since chapter two *Stopped and Searched* has already outlined the racial compostion of our dataset, I will begin with investigating if the reasons black drivers are getting pulled over are comparable to white ones. This will involve an analysis of the *reason_for_stop* category. 
@@ -117,6 +173,6 @@ const raceOutcome = twoLevelRollUpFlatMap(
 ```js
 raceOutcome
 ```
-Here we see that
+Here we see that black drivers are arrested at a substantially higher clip 
 
 

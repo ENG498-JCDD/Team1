@@ -131,3 +131,24 @@ export const threeLevelRollUpFlatMap = (data, level1Key, level2Key, level3Key, c
   // 3. Return the flattened array
   return flatTotals
 }
+
+export const normalizeLocation = (d) => {
+  /**
+   * Use .get() to retrieve the keyed varied value
+   * linked to a value that will normalize it.
+   * EXAMPLES:
+   *  - Incoming value of `"RALEOIGH, Wake County"`
+   *    will return a normed value of `"RALEIGH"`
+   *  - Incoming value of `"RA, Wake County"`
+   *    will return a normed value of `"RALEIGH"`
+  **/
+  const newNormal = LOCATIONS.get(d)
+
+  if ( (newNormal != null) || (newNormal != "") ) {
+    return newNormal
+  }
+  else {
+    return "NOT_FOUND"
+  }
+
+}
