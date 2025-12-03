@@ -81,6 +81,39 @@ const flatStopsByRace = raleighStopsByRace.flatMap(
 ```
 
 ```js
+Plot.plot({
+  title: "Reason for Stop Racial Breakdown",
+  width: 1100,
+  grid: true,
+  marginLeft: 100,
+  marginRight: 0,
+  marginBottom: 60,
+  marginTop: 60,
+  label: null,
+  color: {legend: true},
+  x: {label: "Reason for Stop", padding: 0},
+  y: {label: "Absolute Frequency", padding: 0},
+  marks: [
+    Plot.ruleY([0]),
+    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
+    Plot.barY(
+      afRaceByReason
+       ,
+      {
+        x: "",
+        y: "count",
+        fill: "race",
+        sort: {x: "-y"},
+        insetRight: 10,
+        insetLeft: 10,
+        tip: true,
+        color: {
+    domain: ["White", "Black", "Hispanic", "Asian"],
+    range: ["red", "blue", "green", "black"]
+      }
+    })
+  ]
+})
 
 ```
 
