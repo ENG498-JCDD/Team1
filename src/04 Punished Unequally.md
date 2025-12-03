@@ -4,13 +4,13 @@ import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getU
 ```
 ## Overview
 
-This chapter provides an in-depth analysis of the outcomes black and white driver's face for traffic stops. It analyzes officer's reason for stopping drivers in conjunction with citations issued, and looks to uncover distinct patterns in the penalties driver's may face for getting pulled over.
+This chapter provides an in-depth analysis of the outcomes black and white driver's face for traffic stops. It analyzes officer's reasons officers stop drivers in conjunction with outcomes, and looks to uncover distinct patterns in the penalties driver's may recieve for getting pulled over.
 
-This involves three variables in our dataset: race, reason_for_stop, and citation.
+This involves three variables in our dataset: race, reason_for_stop, and outcome.
 
 **Hypothesis**
 
-Our hypothesis, or h3, is: Black drivers receive harsher outcomes than White drivers for the same violations, with fewer warnings and more arrests. This happens because officers exercise discretion based on race, escalating punishment for Black drivers. Without standardized protocols, discriminatory outcomes will persist, but objective enforcement guidelines can reduce discretionary disparities.
+Our hypothesis, or h3, is: Black drivers receive harsher outcomes than White drivers for the same violations, with fewer warnings and more arrests. This happens because officers exercise discretion based on race, escalating punishment for Black drivers. Without standardized protocols, discriminatory outcomes will persist, but objective enforcement guidelines can reduce racial-based disparities.
 
 ### Research Question
 **Are black drivers searched for similar reasons to white drivers, and are these searches jutified by contraband found?**
@@ -96,9 +96,27 @@ Plot.plot({
 ```
 As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Wake County as a whole, according to recent census data, is approximately **19** percent black and **57** percent white, and Raleigh is roughly **26** percent black and **51** percent white. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
-## Part 2: Citation
+## Part 2: Outcome by Race
+Next let's examine the Citation_Issued category. This category is binary, divided into either true or false. In our dataset, the black population is once again overrepresented, particularly when considering Wake County and Raleigh's racial composition.
 
+```js
+// filter out NAs in outcomes
+const filteredOutcome = raleighStops.filter()
+// rollup
+const raceCitation = twoLevelRollUpFlatMap(
+  raleighStops,
+  "race",
+  "outcome",
+  "af",
+)
+```
+<p class="codeblock-caption">
+  Interactive Map output of Citations by <code>race</code>.
+</p>
 
-
+```js
+raceCitation
+```
+Here we see that
 
 
