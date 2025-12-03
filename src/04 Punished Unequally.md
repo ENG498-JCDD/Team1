@@ -97,25 +97,25 @@ Plot.plot({
 As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Wake County as a whole, according to recent census data, is approximately **19** percent black and **57** percent white, and Raleigh is roughly **26** percent black and **51** percent white. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
-Next let's examine the Citation_Issued category. This category is binary, divided into either true or false. In our dataset, the black population is once again overrepresented, particularly when considering Wake County and Raleigh's racial composition.
+Next let's examine the Citation_Issued category. This category is divided comprises three categories, including Citation, Warning, and Arrest.. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
 // filter out NAs in outcomes
-const filteredOutcome = raleighStops.filter()
+const filteredOutcome = raleighStops.filter(d => d.outcome != "NA")
 // rollup
-const raceCitation = twoLevelRollUpFlatMap(
-  raleighStops,
+const raceOutcome = twoLevelRollUpFlatMap(
+  filteredOutcome,
   "race",
   "outcome",
   "af",
 )
 ```
 <p class="codeblock-caption">
-  Interactive Map output of Citations by <code>race</code>.
+  Interactive Map output of Outcomes by <code>race</code>.
 </p>
 
 ```js
-raceCitation
+raceOutcome
 ```
 Here we see that
 
