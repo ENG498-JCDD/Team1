@@ -46,7 +46,7 @@ const raleighPopRatios = new Map([
 ```
 ```js
 const raleighStopsByRace = d3.rollups(
-  ncPoliceStops,
+  raleighStops,
   (leaves) => {
     /** Adjust for population
      *  If .race is not the unknown category, use formula.
@@ -73,50 +73,45 @@ const raleighStopsByRace = d3.rollups(
 )
 
 // Flatten the rolledup Map
-const flatStopsByRace = raleighStopsByRace.flatMap(
+const flatStopsByRace = raleighStopsByRace.map(
   ([race, racesList]) => {
     return racesList
   }
 )
+
+
 ```
 
 ```js
+
 Plot.plot({
-  title: "Reason for Stop Racial Breakdown",
+  title: "Raleigh Traffic Stops by Race",
   width: 1100,
   grid: true,
   marginLeft: 100,
   marginRight: 0,
   marginBottom: 60,
   marginTop: 60,
-  label: null,
+  x: {label: "Race", padding: 0},
+  y: {label: "Normalized Stop Freq", padding: 0},
   color: {legend: true},
-  x: {label: "Reason for Stop", padding: 0},
-  y: {label: "Absolute Frequency", padding: 0},
   marks: [
     Plot.ruleY([0]),
     Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
-    Plot.barY(
-      afRaceByReason
-       ,
-      {
-        x: "",
-        y: "count",
-        fill: "race",
-        sort: {x: "-y"},
-        insetRight: 10,
-        insetLeft: 10,
-        tip: true,
-        color: {
-    domain: ["White", "Black", "Hispanic", "Asian"],
-    range: ["red", "blue", "green", "black"]
-      }
+    Plot.barY(flatStopsByRace, {
+      x: "race",
+      y: "normalizedStopFreq",
+      insetRight: 10,
+      insetLeft: 10,
+      tip: true,
     })
   ]
 })
+```
+```js
+// Population data
 
 ```
-
 
 ## Part 1: Reason For Stop
 
@@ -206,6 +201,42 @@ const raceOutcome = twoLevelRollUpFlatMap(
 ```js
 raceOutcome
 ```
-Here we see that black drivers are arrested at a substantially higher clip 
+Here we see that black drivers are arrested at a substantially higher clip than white ones, 
+(data).
 
+## Outcomes by Time
 
+But how might this information vary by time? Have racially-motivated outcomes become more or less punitive over the years between 2011-2015? 
+
+```js
+const outcomeRaceDate = threeLevelRollUpFlatMap (
+  filteredOutcome, 
+  "datetime",
+  "outcome",
+  "race",
+  "af"
+)
+
+```
+
+```js
+// Observable Horizon Chart Example
+// chart = Plot.plot({
+//   height: 1100,
+//   width: 928,
+//   x: {axis: "top"},
+//   y: {domain: [0, step], axis: null},
+//   fy: {axis: null, domain: traffic.map((d) => d.name), padding: 0.05},
+//   color: {
+//     type: "ordinal",
+//     scheme: "Greens",
+//     label: "Vehicles per hour",
+//     tickFormat: (i) => ((i + 1) * step).toLocaleString("en"),
+//     legend: true
+//   },
+//   marks: [
+//     d3.range(bands).map((band) => Plot.areaY(traffic, {x: "date", y: (d) => d.value - band * step, fy: "name", fill: band, sort: "date", clip: true})),
+//     Plot.axisFy({frameAnchor: "left", dx: -28, fill: "currentColor", textStroke: "white", label: null})
+//   ]
+// })
+```
