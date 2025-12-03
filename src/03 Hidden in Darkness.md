@@ -23,72 +23,117 @@ Arrests rates by day and night can show us information on if the hypothesis is s
 ## **Let's Begin!**
 
 ```js
-const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true});
-```
+function cleanStops(data) {
+  const yearFormatter = d3.utcFormat("%Y");
+  const monthFormatter = d3.utcFormat("%B");
+  const hourFormatter = d3.utcFormat("%I");
+  const ampmFormatter = d3.utcFormat("%p");
 
-```js
-const monthNumberFormatter = d3.utcFormat("%m")
-const monthNameFormatter = d3.utcFormat("%B")
-const yearNumberFormatter = d3.utcFormat("%Y")
-const AmPmNumberFormatter = d3.utcFormat("%p")
-const HourNumberFormatter = d3.utcFormat("%I")
-```
-
-```js
-raleighStops.map(
-  (stop) => {
-    stop.monthNumber = monthNumberFormatter(stop.datetime)
-    stop.monthName = monthNameFormatter(stop.datetime)
-    stop.yearNumber = yearNumberFormatter(stop.datetime)
-    stop.AmPmNumber = AmPmNumberFormatter(stop.datetime)
-    stop.HourNumber = HourNumberFormatter(stop.datetime)
-
-    return stop
-  }
-)
-```
-
-
-```js
-raleighStops
-```
-
-
-```js
-let raleighStopsInDarkRollUp = d3.rollup(
-  raleighStops,
-  // (leaf) => leaf.length,
-  (leaf) => {
-    return {
-      meanAge: d3.mean(leaf, l => l.age)
-    }
-  },
-  (D) => D.race,
-  (d) => d.datetime,
-    (d) => d.outcome
-);
-```
-
-```js
-raleighStopsInDarkRollUp
-```
-
-
-```js
-const raleighStopsInDarkGroup = d3.group(raleighStops, 
-(d) => d.race,
-  (d) => d.datetime,
-    (d) => d.outcome
-)
-```
-
-```js
-raleighStopsInDarkGroup
-```
-```js
-const raleighStopsCleaned = raleighStops.map(d => ({
-  ...d,
-  datetime_obj: new Date(d.datetime)
+  return data.map(d => ({
+    ...d,
+    year: yearFormatter(d.datetime),
+    month: monthFormatter(d.datetime),
+    hour: hourFormatter(d.datetime),
+    ampm: ampmFormatter(d.datetime),
   }));
+}
+
+function fourLevelRollUpFlatMapTime(data, countKey) {
+  const colTotals = d3.rollups(
+    data,
+    v => v.length,
+    d => d.race,
+    d => d.year,
+    d => d.month,
+    d => `${d.hour} ${d.ampm}`,
+    d => d.outcome
+  );
+
+  return colTotals.flatMap(l1Elem => {
+    const raceVal = l1Elem[0];
+    return l1Elem[1].flatMap(l2Elem => {
+      const yearVal = l2Elem[0];
+      return l2Elem[1].flatMap(l3Elem => {
+        const monthVal = l3Elem[0];
+        return l3Elem[1].flatMap(l4Elem => {
+          const hourVal = l4Elem[0];
+          return l4Elem[1].flatMap(l5Elem => ({
+            race: raceVal,
+            year: yearVal,
+            month: monthVal,
+            hour: hourVal,
+            outcome: l5Elem[0],
+            [countKey]: l5Elem[1]
+          }));
+        });
+      });
+    });
+  });
+}
 ```
-Total between 2011-2015: 323,898
+
+```js
+const raleighStops = await FileAttachment("./data/policestops-with-townships.csv").csv({typed: true});
+const cleaned = cleanStops(raleighStops);
+const rolled = fourLevelRollUpFlatMapTime(cleaned, "count");
+
+rolled
+```
+
+```js
+cleaned
+```
+
+```js
+rolled
+```
+
+The above shows 2 things; the first Array list shows all of our data grouped up with some extra groupings I ended up coding to cut to the chase. The second Array list shows just that.
+
+This list answers the questions: 
+- 
+- What is the race of the person being stopped?
+- What is the year that they were stopped in?
+- What is the month that they were stopped in?
+- What is the hour (including if it is AM or PM) that they were stopped in?
+
+```js
+// Stops only from 2013
+const stops2013 = cleaned.filter(d => d.year === "2013");
+
+// June 2013
+const june2013 = stops2013.filter(d => d.month === "June");
+const juneCounts2013 = d3.rollups(
+  june2013,
+  v => v.length,
+  d => d.race
+).map(([race, count]) => ({ race, month: "June", count }));
+
+// December 2013
+const december2013 = stops2013.filter(d => d.month === "December");
+const decemberCounts2013 = d3.rollups(
+  december2013,
+  v => v.length,
+  d => d.race
+).map(([race, count]) => ({ race, month: "December", count }));
+
+// Combine into one dataset
+const combined2013 = juneCounts2013.concat(decemberCounts2013);
+```
+
+```js
+Plot.plot({
+  marks: [
+    Plot.barY(
+      combined2013,
+      { x: "race", y: "count", fill: "month" }  // fill encodes month
+    )
+  ],
+  x: { label: "Race" },
+  y: { label: "Number of Stops" },
+  color: { legend: true },
+  title: "Traffic Stops by Race in June vs December 2013"
+})
+```
+
+The visualization above lets us analyze stop rates from the solstice months of June and December- which represent respectively the month with the highest hours of daylight vs. the month with the lowest hours of daylight.
