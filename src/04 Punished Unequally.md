@@ -209,36 +209,53 @@ Here we see that black drivers are arrested at a substantially higher clip than 
 But how might this information vary by time? Have racially-motivated outcomes become more or less punitive over the years between 2011-2015? 
 
 ```js
-const outcomeRaceDate = threeLevelRollUpFlatMap (
+const outcomeRaceDate = twoLevelRollUpFlatMap (
   filteredOutcome, 
   "datetime",
   "outcome",
-  "race",
   "af"
 )
 
 ```
 
 ```js
-// Observable Horizon Chart Example
-// chart = Plot.plot({
-//   height: 1100,
-//   width: 928,
-//   x: {axis: "top"},
-//   y: {domain: [0, step], axis: null},
-//   fy: {axis: null, domain: traffic.map((d) => d.name), padding: 0.05},
-//   color: {
-//     type: "ordinal",
-//     scheme: "Greens",
-//     label: "Vehicles per hour",
-//     tickFormat: (i) => ((i + 1) * step).toLocaleString("en"),
-//     legend: true
-//   },
-//   marks: [
-//     d3.range(bands).map((band) => Plot.areaY(traffic, {x: "date", y: (d) => d.value - band * step, fy: "name", fill: band, sort: "date", clip: true})),
-//     Plot.axisFy({frameAnchor: "left", dx: -28, fill: "currentColor", textStroke: "white", label: null})
-//   ]
-// })
+const percBands = view(
+  Inputs.range([2, 8], {step: 1, label: "# of Bands for Horizon Chart"})
+)
+```
+
+```js
+const step = d3.max(outcomeRaceDate, (d) => d.af) / percBands.value
+console.log(step)
+```
+
+```js
+Plot.plot({
+  height: 720,
+  x: { axis: "top" },
+  y: { domain: [0, step], axis: null },
+  color: {
+    type: "ordinal",
+    scheme: "Greens",
+    label: "Reason For Stops by date",
+    tickFormat: i => ((i + 1) * step).toLocaleString("en"),
+    legend: true
+  },
+  facet: {
+    fy: "outcome"
+  },
+  marks: [
+    ...d3.range(percBands.value).map(band =>
+      Plot.areaY(outcomeRaceDate, {
+        x: "datetime",
+        y: d => Math.max(0, d.af - band * step),
+        fill: band,
+        sort: "datetime",
+        clip: true
+      })
+    )
+  ]
+})
 ```
 
 ## Part 3: Reason For Stop By Outcome and Race
@@ -355,7 +372,9 @@ for (const raceValue of uniqueRaceList) {
 
 
 
-
+```js
+console.log(outcomeRaceDate)
+```
 
 
 ## Key Findings
