@@ -130,7 +130,7 @@ There are ten reasons for police stops represented in our dataset.
 9. Other Motor Vehicle Violation
 10. Checkpoint
 
-Let's first check the frequency of each stop by race in our dataset.
+Let's first check the frequency of each stop by race.
 
 ```js
 const afRaceByReason = d3.rollups(
@@ -141,7 +141,7 @@ const afRaceByReason = d3.rollups(
 ).flatMap(([race, reasons]) =>
   reasons.map(([reason_for_stop, count]) => ({race, reason_for_stop, count}))
 )
-//oneLevelRollUpFlatMap was producing different plot
+//LevelRollUpFlatMap was producing different plot
 ```
 ```js
 Plot.plot({
@@ -181,7 +181,7 @@ Plot.plot({
 As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Wake County as a whole, according to recent census data, is approximately **19** percent black and **57** percent white, and Raleigh is roughly **26** percent black and **51** percent white. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
-Next let's examine the Citation_Issued category. This category is divided comprises three categories, including Citation, Warning, and Arrest.. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
+Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest.. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
 // filter out NAs in outcomes
@@ -204,7 +204,7 @@ raceOutcome
 Here we see that black drivers are arrested at a substantially higher clip than white ones, 
 (data).
 
-## Outcomes by Time
+### 2.1 Outcomes by Time
 
 But how might this information vary by time? Have racially-motivated outcomes become more or less punitive over the years between 2011-2015? 
 
@@ -240,3 +240,122 @@ const outcomeRaceDate = threeLevelRollUpFlatMap (
 //   ]
 // })
 ```
+
+## Part 3: Reason For Stop By Outcome and Race
+
+Through an analysis of each of these categories, we start to see some patterns. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered severity compared to other reasons for stop represented in our dataset, such as driving while impaired, how many of each resulted in arrests or citations for black and white drivers? 
+
+
+```js
+const stopsWithReasonOutcome = raleighStops.filter(
+d => d.outcome != "NA" && d.reason_for_stop != "NA"
+)
+
+const raceOutcomeReason = threeLevelRollUpFlatMap(
+  stopsWithReasonOutcome,
+  "race",
+  "outcome",
+  "reason_for_stop",
+  "af"
+)
+```
+```js
+// Reducer function for reason_for_stop arrest or citation
+// Returns count if arrest or citation was made for VRV or SLV
+const reasonReducer = (d) => {
+  const vrv = d.reason_for_stop == "Vehicle Regulatory Violation"
+  const slv = d.reason_for_stop == "Speed Limit Violation"
+
+  const arrestOrCitation = d.outcome == "arrest" || d.outcome == "citation"
+
+ if ((vrv || slv) && arrestOrCitation) {
+  return d.count
+} else {
+  return 0
+}
+}
+
+// Reducer function for reason_for_stop warning
+// Returns count if warning was issued for VRV or SLV
+const warningReducer = (d) => {
+  const vrv = d.reason_for_stop == "Vehicle Regulatory Violation"
+  const slv = d.reason_for_stop == "Speed Limit Violation"
+
+  const isWarning = d.outcome == "warning"
+
+  if ((vrv || slv) && isWarning) {
+    return d.count
+  } else {
+    return 0
+  }
+}
+```
+
+```js
+// Get all unique races from the data
+const uniqueRaceList = getUniquePropListBy(
+  raceOutcomeReason,
+  "race"
+)
+
+// Reducer functions objectified
+const reducerFuncs = [
+  {
+    type: "Arrest or Citation",
+    func: reasonReducer
+  },
+  {
+    type: "Warning",
+    func: warningReducer
+  }
+]
+```
+```js
+// Create array for results
+const arrestOrCitationResults = []
+
+// Loop through all RACE values
+for (const raceValue of uniqueRaceList) {
+
+  // Loop through reducer functions
+  for (const testorObj in reducerFuncs) {
+
+    const totalSearchesForRace = d3.sum(
+      raceSearchContraband,
+      (d) => {
+        if (d.race == raceValue && d.search_conducted == "TRUE") {
+          return d.count
+        }
+      }
+    )
+
+    // Calculate the sum for FOUND or NOT_FOUND using the reducer function
+    const summedUpLevel = d3.sum(
+      raceSearchContraband,
+      (d) => {
+        if (d.race == raceValue && d.search_conducted == "TRUE") {
+          const xTotalToSum = reducerFuncs[testorObj]["func"](d)
+          return xTotalToSum
+        }
+      }
+    )
+
+    // Push results
+    contrabandPercResults.push({
+      race: raceValue,
+      contraband_status: reducerFuncs[testorObj]["type"],
+      count: summedUpLevel,
+      total_searches: totalSearchesForRace,
+      percentage: summedUpLevel / totalSearchesForRace,
+    })
+  }
+}
+```
+
+
+
+
+
+
+
+## Key Findings
