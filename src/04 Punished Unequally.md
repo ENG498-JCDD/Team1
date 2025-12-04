@@ -42,6 +42,7 @@ const raleighPopRatios = new Map([
   ["native", 0.003*raleighPop],
   ["asian/pacific islander", 0.044*raleighPop],
   ["unknown", null],
+  ["other", null],
 ])
 ```
 ```js
@@ -51,7 +52,7 @@ const raleighStopsByRace = d3.rollups(
     /** Adjust for population
      *  If .race is not the unknown category, use formula.
     **/
-    if (leaves[0].race != "unknown") {
+    if (leaves[0].race != "unknown" && leaves[0].race != "other") {
       return {
         race: leaves[0].race,
         stopFreq: leaves.length,
@@ -78,8 +79,10 @@ const flatStopsByRace = raleighStopsByRace.map(
     return racesList
   }
 )
+```
 
-
+```js
+flatStopsByRace
 ```
 
 ```js
@@ -98,13 +101,17 @@ Plot.plot({
   marks: [
     Plot.ruleY([0]),
     Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
-    Plot.barY(flatStopsByRace, {
-      x: "race",
-      y: "normalizedStopFreq",
-      insetRight: 10,
-      insetLeft: 10,
-      tip: true,
-    })
+    Plot.barY(
+      flatStopsByRace.filter((d) => (d.race != "other" && d.race != "unknown")),
+      {
+        x: "race",
+        y: "normalizedStopFreq",
+        insetRight: 10,
+        insetLeft: 10,
+        tip: true,
+        sort: {x: "-y"},
+      }
+    )
   ]
 })
 ```
@@ -133,6 +140,7 @@ There are ten reasons for police stops represented in our dataset.
 Let's first check the frequency of each stop by race.
 
 ```js
+// 1. Rollup by ____
 const afRaceByReason = d3.rollups(
   raleighStops,
   v => v.length,
@@ -143,6 +151,23 @@ const afRaceByReason = d3.rollups(
 )
 //LevelRollUpFlatMap was producing different plot
 ```
+
+```js
+// 2. Add normalized AFs
+const afRaceByReasonUpdated = afRaceByReason.map(
+  (stop) => {
+    let af = stop.count
+    stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+    stop.raceAndReason = stop.race + "-" + stop.reason_for_stop
+    return stop
+  }
+)
+```
+
+```js
+afRaceByReasonUpdated
+```
+
 ```js
 Plot.plot({
   title: "Reason for Stop Racial Breakdown",
@@ -160,11 +185,10 @@ Plot.plot({
     Plot.ruleY([0]),
     Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
     Plot.barY(
-      afRaceByReason
-       ,
+      afRaceByReasonUpdated,
       {
         x: "reason_for_stop",
-        y: "count",
+        y: "normalizedCount",
         fill: "race",
         sort: {x: "-y"},
         insetRight: 10,
@@ -181,6 +205,7 @@ Plot.plot({
 As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Wake County as a whole, according to recent census data, is approximately **19** percent black and **57** percent white, and Raleigh is roughly **26** percent black and **51** percent white. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
+
 Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest.. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
@@ -209,7 +234,7 @@ Here we see that black drivers are arrested at a substantially higher clip than 
 But how might this information vary by time? Have racially-motivated outcomes become more or less punitive over the years between 2011-2015? 
 
 ```js
-const outcomeRaceDate = threeLevelRollUpFlatMap (
+const outcomeRaceDate = threeLevelRollUpFlatMap(
   filteredOutcome, 
   "datetime",
   "outcome",
@@ -221,24 +246,24 @@ const outcomeRaceDate = threeLevelRollUpFlatMap (
 
 ```js
 // Observable Horizon Chart Example
-// chart = Plot.plot({
-//   height: 1100,
-//   width: 928,
-//   x: {axis: "top"},
-//   y: {domain: [0, step], axis: null},
-//   fy: {axis: null, domain: traffic.map((d) => d.name), padding: 0.05},
-//   color: {
-//     type: "ordinal",
-//     scheme: "Greens",
-//     label: "Vehicles per hour",
-//     tickFormat: (i) => ((i + 1) * step).toLocaleString("en"),
-//     legend: true
-//   },
-//   marks: [
-//     d3.range(bands).map((band) => Plot.areaY(traffic, {x: "date", y: (d) => d.value - band * step, fy: "name", fill: band, sort: "date", clip: true})),
-//     Plot.axisFy({frameAnchor: "left", dx: -28, fill: "currentColor", textStroke: "white", label: null})
-//   ]
-// })
+Plot.plot({
+  height: 1100,
+  width: 928,
+  x: {axis: "top"},
+  y: {domain: [0, step], axis: null},
+  fy: {axis: null, domain: traffic.map((d) => d.name), padding: 0.05},
+  color: {
+    type: "ordinal",
+    scheme: "Greens",
+    label: "Vehicles per hour",
+    tickFormat: (i) => ((i + 1) * step).toLocaleString("en"),
+    legend: true
+  },
+  marks: [
+    d3.range(bands).map((band) => Plot.areaY(traffic, {x: "date", y: (d) => d.value - band * step, fy: "name", fill: band, sort: "date", clip: true})),
+    Plot.axisFy({frameAnchor: "left", dx: -28, fill: "currentColor", textStroke: "white", label: null})
+  ]
+})
 ```
 
 ## Part 3: Reason For Stop By Outcome and Race
