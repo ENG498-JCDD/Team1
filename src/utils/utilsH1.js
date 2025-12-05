@@ -1,4 +1,5 @@
 import {rollups} from "npm:d3-array";
+import {utcFormat} from "npm:d3-time-format";
 
 /** getUniquePropListBy()
  * Goal: Create a unique list of `x` property
@@ -151,4 +152,66 @@ export const normalizeLocation = (d) => {
     return "NOT_FOUND"
   }
 
+}
+
+export const addDateAndTimeFeatures = (data) => {
+  const yearFormatter = utcFormat("%Y");
+  const monthFormatter = utcFormat("%B");
+  const dayFormatter = utcFormat("%a %d");
+  const dayOfYearFormatter = utcFormat("%a %d");
+  const hourFormatter = utcFormat("%I");
+  const ampmFormatter = utcFormat("%p");
+
+  return data.map(d => ({
+    ...d,
+    year: yearFormatter(d.datetime),
+    month: monthFormatter(d.datetime),
+    day: dayFormatter(d.datetime),
+    day_of_year: dayOfYearFormatter(d.datetime),
+    hour: hourFormatter(d.datetime),
+    ampm: ampmFormatter(d.datetime),
+  }));
+}
+
+export const fourLevelRollUpFlatMapTime = (data, countKey) => {
+  const colTotals = d3.rollups(
+    data,
+    v => v.length,
+    d => d.race,
+    d => d.year,
+    d => d.month,
+    d => `${d.hour} ${d.ampm}`,
+    d => d.outcome
+  );
+
+  return colTotals.flatMap(l1Elem => {
+    const raceVal = l1Elem[0];
+    return l1Elem[1].flatMap(l2Elem => {
+      const yearVal = l2Elem[0];
+      return l2Elem[1].flatMap(l3Elem => {
+        const monthVal = l3Elem[0];
+        return l3Elem[1].flatMap(l4Elem => {
+          const hourVal = l4Elem[0];
+          return l4Elem[1].flatMap(l5Elem => ({
+            race: raceVal,
+            year: yearVal,
+            month: monthVal,
+            hour: hourVal,
+            outcome: l5Elem[0],
+            [countKey]: l5Elem[1]
+          }));
+        });
+      });
+    });
+  });
+}
+
+export const getRace = (raceOutcomeString) => {
+  // regex pattern for "race-outcome"
+  const reGroupString = /(.{1,})-.{1,}/gm;
+  // Find matches
+  const matches = reGroupString.exec(raceOutcomeString);
+  // Return only first group in match, which is the race category
+  const justRace = matches[1].trim();
+  return justRace
 }
