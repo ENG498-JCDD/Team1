@@ -255,10 +255,9 @@ Plot.plot({
 ```
 
 ## Traffic Stops per Hour Statistics (Black & White Drivers)
-
 ```js
 // Group stops by hour > race > light_condition
-const stopsGroupedByHourRaceLight = threeLevelRollUpFlatMap(
+const stopsByHourRaceLight = threeLevelRollUpFlatMap(
   stopsWithDateTime,
   "hour",
   "race",
@@ -267,28 +266,34 @@ const stopsGroupedByHourRaceLight = threeLevelRollUpFlatMap(
 )
 ```
 ```js
-// Filter to only Black and White drivers
-const blackWhiteStops = stopsGroupedByHourRaceLight.filter(
+// Calculate TOTAL stops for Black and White only (grand total)
+const grandTotal = d3.sum(
+  stopsByHourRaceLight,
   (d) => {
     if (d.race == "black" || d.race == "white") {
-      return true
+      return d.count
     }
   }
 )
-```
-```js
-// Calculate TOTAL stops for Black and White (grand total)
-const grandTotal = d3.sum(blackWhiteStops, d => d.count)
-```
-```js
-// Add percentage field to each row
-for (const row of blackWhiteStops) {
-  row.percentage = row.count / grandTotal
+
+// Calculate percentages as % of grand total
+const blackWhiteOnly = []
+for (const row of stopsByHourRaceLight) {
+  // Only include Black and White
+  if (row.race == "black" || row.race == "white") {
+    blackWhiteOnly.push({
+      hour: row.hour,
+      race: row.race,
+      light_condition: row.light_condition,
+      count: row.count,
+      percentage: row.count / grandTotal
+    })
+  }
 }
 ```
 ```js
 // Create array of all percentages for Black and White
-const stopPercentages = blackWhiteStops.map(
+const stopPercentages = blackWhiteOnly.map(
   (d) => {
     if (isNaN(d.percentage) == false) {
       return d.percentage
@@ -301,12 +306,12 @@ const stopPercentages = blackWhiteStops.map(
 ```
 
 #### Location
-- **Average mean**: ${(d3.mean(blackWhiteStops, d => d.percentage) * 100).toFixed(2)}%
-- **Median**: ${(d3.median(blackWhiteStops, d => d.percentage) * 100).toFixed(2)}%
-- **Mode**: ${(d3.mode(blackWhiteStops, d => d.percentage) * 100).toFixed(2)}%
+- **Average mean**: ${(d3.mean(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
+- **Median**: ${(d3.median(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
+- **Mode**: ${(d3.mode(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
 
 #### Spread
-**Range**: ${d3.min(blackWhiteStops, d => d.percentage)} - ${d3.max(blackWhiteStops, d => d.percentage)}, (or ${(d3.min(blackWhiteStops, d => d.percentage)*100).toFixed(2)}% - ${(d3.max(blackWhiteStops, d => d.percentage)*100).toFixed(2)}%).
+**Range**: ${d3.min(blackWhiteOnly, d => d.percentage)} to ${d3.max(blackWhiteOnly, d => d.percentage)}, (or ${(d3.min(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}% to ${(d3.max(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}%).
 
 **Variance of traffic stops**: ${d3.variance(stopPercentages).toFixed(10)}
 
@@ -342,7 +347,7 @@ Plot.plot({
     Plot.ruleY([0]),
     
     // Mean line
-    Plot.ruleY([d3.mean(blackWhiteStops, d => d.percentage)], {
+    Plot.ruleY([d3.mean(blackWhiteOnly, d => d.percentage)], {
       stroke: "gray",
       strokeWidth: 2,
       strokeDasharray: "4,4"
@@ -350,7 +355,7 @@ Plot.plot({
     
     // Dots for each data point
     Plot.dot(
-      blackWhiteStops,
+      blackWhiteOnly,
       {
         x: "hour",
         y: "percentage",
@@ -363,13 +368,6 @@ Plot.plot({
   ]
 })
 ```
-
-
-
-
-
-
-
 
 
 
