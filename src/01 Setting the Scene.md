@@ -51,15 +51,20 @@ Spring/Fall (Mar-Apr, Sep-Oct): Use 7pm (hour < 19)
 for (const stop of stopsWithDateTime) {
   let daylight
   
-  // Summer months (5-8): daylight until 8pm
-  if (stop.month >= 5 && stop.month <= 8) {
+  // Peak summer (June-July): Daylight until 9pm
+  if (stop.month === 6 || stop.month === 7) {
+    daylight = stop.hour < 21
+  }
+  // Early/late summer (May, August): Daylight until 8pm
+  else if (stop.month === 5 || stop.month === 8) {
     daylight = stop.hour < 20
   }
-  // Winter months (11-12, 1-2): dark by 6pm
+
+  // Winter (Nov-Feb): Dark by 6pm
   else if (stop.month === 11 || stop.month === 12 || stop.month === 1 || stop.month === 2) {
     daylight = stop.hour < 18
   }
-  // Spring/Fall (3-4, 9-10): use 7pm
+  // Spring/Fall (Mar-Apr, Sep-Oct): 7pm cutoff
   else {
     daylight = stop.hour < 19
   }
@@ -433,6 +438,147 @@ Plot.plot({
         strokeWidth: 2.5,
         tip: true,
         title: d => `${d.race}: ${d.count} stops at hour ${d.hour}`
+      }
+    )
+  ]
+})
+```
+
+
+
+central tendency
+
+```js
+// Group stops by hour > race > light_condition
+const stopsByHourRaceLight = threeLevelRollUpFlatMap(
+  stopsWithDateTime,
+  "hour",
+  "race",
+  "light_condition",
+  "count"
+)
+```
+
+```js
+const uniqueListOfHours = getUniquePropListBy(stopsByHourRaceLight, "hour")
+const reducerProps = getUniquePropListBy(stopsByHourRaceLight, "race")
+```
+
+```js
+// Calculate TOTAL stops for Black and White only (grand total)
+const grandTotal = d3.sum(
+  stopsByHourRaceLight,
+  (d) => {
+    if (d.race === "black" || d.race === "white") {
+      return d.count
+    }
+  }
+)
+
+// Calculate percentages as % of grand total
+const reducedStopsData = []
+
+for (const row of stopsByHourRaceLight) {
+  // Only include Black and White
+  if (row.race === "black" || row.race === "white") {
+    reducedStopsData.push({
+      hour: row.hour,
+      race: row.race,
+      light_condition: row.light_condition,
+      count: row.count,
+      percentage: row.count / grandTotal  // % of ALL Black+White stops
+    })
+  }
+}
+```
+
+```js
+// This is now redundant since we already filtered, but keep for consistency
+const blackWhiteOnly = reducedStopsData  // Already filtered above
+```
+
+```js
+// Create array of all percentages for Black and White
+const stopPercentages = blackWhiteOnly.map(
+  (d) => {
+    if (isNaN(d.percentage) === false) {
+      return d.percentage
+    }
+    else {
+      return 0
+    }
+  }
+)
+```
+
+
+```js
+// Check percentages array
+stopPercentages
+```
+
+### Traffic Stops per Hour Statistics (Black & White Drivers)
+
+#### Location
+- **Average mean**: ${(d3.mean(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
+- **Median**: ${(d3.median(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
+- **Mode**: ${(d3.mode(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
+
+#### Spread
+**Range**: ${d3.min(blackWhiteOnly, d => d.percentage)} - ${d3.max(blackWhiteOnly, d => d.percentage)}, (or ${(d3.min(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}% - ${(d3.max(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}%).
+
+**Variance of traffic stops**: ${d3.variance(stopPercentages).toFixed(10)}
+
+**Standard deviation of traffic stops**: On average, all traffic stops per hour deviate from the mean by <strong>${(100 * d3.deviation(stopPercentages)).toFixed(2)}%</strong>.
+
+
+
+```js
+
+Plot.plot({
+  title: "Traffic Stop Distribution by Hour, Race, and Light Condition",
+  width: 1000,
+  height: 500,
+  marginLeft: 80,
+  marginBottom: 80,
+  marginTop: 60,
+  marginRight: 150,
+  grid: true,
+  
+  x: {
+    label: "Hour of Day",
+    domain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+  },
+  
+  y: {
+    label: "Percentage",
+    percent: true
+  },
+  
+  color: {
+    legend: true,
+    domain: ["black", "white"],
+    range: ["#ff7f0e", "#1f77b4"]
+  },
+  
+  marks: [
+    // Mean line
+    Plot.ruleY([d3.mean(blackWhiteOnly, d => d.percentage)], {
+      stroke: "gray",
+      strokeWidth: 2,
+      strokeDasharray: "4,4"
+    }),
+    
+    // Dots for each data point
+    Plot.dot(
+      blackWhiteOnly,
+      {
+        x: "hour",
+        y: "percentage",
+        fill: d => d.race === "black" ? "#ff7f0e" : "#1f77b4",  // Explicit colors!
+        r: 5,
+        tip: true,
+        title: d => `Hour ${d.hour}, ${d.race}, ${d.light_condition}: ${(d.percentage * 100).toFixed(2)}%`
       }
     )
   ]
