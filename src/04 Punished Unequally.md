@@ -193,7 +193,7 @@ Plot.plot({
 As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Black drivers are roughly **1.3** times more likely than white drivers to get pulled over for Vehicle Regulatory Violations, and **.7** times more likely to get pulled over for possible speeding infractions. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
-Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest.. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
+Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
 const afRaceByOutcome = d3.rollups(
@@ -232,15 +232,15 @@ const outcomeTime = twoLevelRollUpFlatMap (
 
 const percBands = view(
   Inputs.range([2, 8], {step: 1, label: "# of Bands for Horizon Chart"})
-)
+);
 
-const step = d3.max(outcomeTime, (d) => d.af) / percBands
+const step = d3.max(outcomeTime, (d) => d.af) / percBands;
 
 Plot.plot({
  height: 720,
  x: {axis: "top"},
  y: {domain: [0, step], axis: null},
- fy: {axis: true, domain: outcomeTime.map((d) => d.outcome), padding: 0.05},
+ fy: {axis: null, domain: outcomeTime.map((d) => d.outcome), padding: 0.05},
  color: {
    type: "ordinal",
    scheme: "Greens",
