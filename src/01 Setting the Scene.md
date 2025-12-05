@@ -384,7 +384,184 @@ import {html} from "npm:htl"
 
 Visualization 3: Twilight Period
 
-Step 1: 
+
+```js
+// Add 30-minute time bin to each stop
+for (const stop of stopsWithDateTime) {
+  const hour = stop.hour
+  const minute = stop.minute
+  
+  // Determine which 30-minute bin
+  let timeBin
+  
+  if (minute < 30) {
+    // First half of the hour (e.g., 5:00-5:29)
+    timeBin = `${hour}:00 to ${hour}:29`
+  } else {
+    // Second half of the hour (e.g., 5:30-5:59)
+    timeBin = `${hour}:30 to ${hour}:59`
+  }
+  
+  stop.time_bin = timeBin
+}
+```
+
+```js
+// Check a few examples
+stopsWithDateTime.slice(0, 5)
+```
+
+```js
+// Filter to evening hours only (17-21 = 5pm to 9pm)
+const eveningStops = stopsWithDateTime.filter(
+  d => d.hour >= 17 && d.hour <= 21
+)
+```
+```js
+// Group by time_bin, light_condition, and race
+const eveningByTimeBinLightRace = threeLevelRollUpFlatMap(
+  eveningStops,
+  "time_bin",
+  "light_condition",
+  "race",
+  "count"
+)
+```
+```js
+// Check the output
+eveningByTimeBinLightRace
+```
+
+```js
+// Calculate Black driver percentage for each time bin and light condition
+const eveningBlackPercentages = []
+
+// Create list of all time bins in order
+const timeBins = [
+  "17:00 to 17:29", "17:30 to 17:59",
+  "18:00 to 18:29", "18:30 to 18:59",
+  "19:00 to 19:29", "19:30 to 19:59",
+  "20:00 to 20:29", "20:30 to 20:59",
+  "21:00 to 21:29", "21:30 to 21:59"
+]
+
+// Loop through each time bin
+for (const timeBin of timeBins) {
+  
+  // Loop through Daylight and Darkness
+  for (const condition of ["Daylight", "Darkness"]) {
+    
+    // Get stops for this time bin and condition
+    const stopsForCell = eveningByTimeBinLightRace.filter(
+      d => d.time_bin === timeBin && d.light_condition === condition
+    )
+    
+    // Find Black and White counts
+    let blackCount = 0
+    let whiteCount = 0
+    
+    for (const row of stopsForCell) {
+      if (row.race === "black") {
+        blackCount = row.count
+      }
+      if (row.race === "white") {
+        whiteCount = row.count
+      }
+    }
+    
+    // Calculate percentage
+    const totalCount = blackCount + whiteCount
+    
+    if (totalCount > 0) {
+      const blackPercentage = (blackCount / totalCount) * 100
+      
+      eveningBlackPercentages.push({
+        time_bin: timeBin,
+        condition: condition,
+        black_percentage: blackPercentage,
+        total_stops: totalCount
+      })
+    }
+  }
+}
+```
+```js
+// Check the output
+eveningBlackPercentages
+```
+
+```js
+Plot.plot({
+  title: "Percent Stops of Black Drivers: Daylight vs Darkness",
+  width: 1000,
+  height: 500,
+  marginLeft: 80,
+  marginRight: 250,
+  marginBottom: 100,
+  grid: true,
+  
+  x: {
+    label: "Time Window",
+    tickRotate: -45
+  },
+  
+  y: {
+    label: "Percentage of Stops that are Black Drivers (%)",
+    domain: [40, 65],
+    grid: true
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    // Daylight line (solid)
+    Plot.lineY(
+      eveningBlackPercentages.filter(d => d.condition === "Daylight"),
+      {
+        x: "time_bin",
+        y: "black_percentage",
+        stroke: "#000",
+        strokeWidth: 2.5,
+        marker: "circle"
+      }
+    ),
+    
+    // Darkness line (dashed)
+    Plot.lineY(
+      eveningBlackPercentages.filter(d => d.condition === "Darkness"),
+      {
+        x: "time_bin",
+        y: "black_percentage",
+        stroke: "#000",
+        strokeWidth: 2.5,
+        strokeDasharray: "8,4",
+        marker: "circle"
+      }
+    ),
+    
+    // Dots with tooltips
+    Plot.dot(eveningBlackPercentages, {
+      x: "time_bin",
+      y: "black_percentage",
+      fill: "#000",
+      r: 5,
+      tip: true,
+      title: d => `${d.time_bin} (${d.condition}): ${d.black_percentage.toFixed(1)}%`
+    })
+  ]
+})
+```
+
+
+
+
+
+
+
+
+
+
+<!-- Step 1: 
 
 ```js
 // Filter to twilight period only (hours 18-21)
@@ -525,4 +702,4 @@ Plot.plot({
     })
   ]
 })
-```
+``` -->
