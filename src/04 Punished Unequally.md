@@ -83,33 +83,33 @@ const flatStopsByRace = raleighStopsByRace.map(
 ```
 
 ```js
-
 Plot.plot({
-  title: "Raleigh Traffic Stops by Race",
-  width: 1100,
-  grid: true,
-  marginLeft: 100,
-  marginRight: 0,
-  marginBottom: 60,
-  marginTop: 60,
-  x: {label: "Race", padding: 0},
-  y: {label: "Normalized Stop Freq", padding: 0},
-  color: {legend: true},
-  marks: [
-    Plot.ruleY([0]),
-    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
-    Plot.barY(flatStopsByRace, {
-      x: "race",
-      y: "normalizedStopFreq",
-      insetRight: 10,
-      insetLeft: 10,
-      tip: true,
-    })
-  ]
+ title: "Raleigh Traffic Stops by Race",
+ width: 1100,
+ grid: true,
+ marginLeft: 100,
+ marginRight: 0,
+ marginBottom: 60,
+ marginTop: 60,
+ x: {label: "Race", padding: 0},
+ y: {label: "Normalized Stop Freq", padding: 0},
+ color: {legend: true},
+ marks: [
+   Plot.ruleY([0]),
+   Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
+   Plot.barY(
+     flatStopsByRace.filter((d) => (d.race != "other" && d.race != "unknown")),
+     {
+       x: "race",
+       y: "normalizedStopFreq",
+       insetRight: 10,
+       insetLeft: 10,
+       tip: true,
+       sort: {x: "-y"},
+     }
+   )
+ ]
 })
-```
-```js
-// Population data
 
 ```
 
@@ -143,72 +143,84 @@ const afRaceByReason = d3.rollups(
 )
 //LevelRollUpFlatMap was producing different plot
 ```
+
+```js
+// 2. Add normalized AFs
+const afRaceByReasonUpdated = afRaceByReason.map(
+ (stop) => {
+   let af = stop.count
+   stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+   stop.raceAndReason = stop.race + "-" + stop.reason_for_stop
+   return stop
+ }
+)
+```
 ```js
 Plot.plot({
-  title: "Reason for Stop Racial Breakdown",
-  width: 1100,
-  grid: true,
-  marginLeft: 100,
-  marginRight: 0,
-  marginBottom: 60,
-  marginTop: 60,
-  label: null,
-  color: {legend: true},
-  x: {label: "Reason for Stop", padding: 0},
-  y: {label: "Absolute Frequency", padding: 0},
-  marks: [
-    Plot.ruleY([0]),
-    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
-    Plot.barY(
-      afRaceByReason
-       ,
-      {
-        x: "reason_for_stop",
-        y: "count",
-        fill: "race",
-        sort: {x: "-y"},
-        insetRight: 10,
-        insetLeft: 10,
-        tip: true,
-        color: {
-    domain: ["White", "Black", "Hispanic", "Asian"],
-    range: ["red", "blue", "green", "black"]
-      }
-    })
-  ]
+ title: "Reason for Stop Racial Breakdown",
+ width: 1100,
+ grid: true,
+ marginLeft: 100,
+ marginRight: 0,
+ marginBottom: 60,
+ marginTop: 60,
+ label: null,
+ color: {legend: true},
+ x: {label: "Reason for Stop", padding: 0},
+ y: {label: "Absolute Frequency", padding: 0},
+ marks: [
+   Plot.ruleY([0]),
+   Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
+   Plot.barY(
+     afRaceByReasonUpdated,
+     {
+       x: "reason_for_stop",
+       y: "normalizedCount",
+       fill: "race",
+       sort: {x: "-y"},
+       insetRight: 10,
+       insetLeft: 10,
+       tip: true,
+       color: {
+   domain: ["White", "Black", "Hispanic", "Asian"],
+   range: ["red", "blue", "green", "black"]
+     }
+   })
+ ]
 })
+
 ```
-As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Wake County as a whole, according to recent census data, is approximately **19** percent black and **57** percent white, and Raleigh is roughly **26** percent black and **51** percent white. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
+As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Black drivers are roughly **1.3** times more likely than white drivers to get pulled over for Vehicle Regulatory Violations, and **.7** times more likely to get pulled over for possible speeding infractions. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
 Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest.. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
-// filter out NAs in outcomes
-const filteredOutcome = raleighStops.filter(d => d.outcome != "NA")
-// rollup
-const raceOutcome = twoLevelRollUpFlatMap(
-  filteredOutcome,
-  "race",
-  "outcome",
-  "af",
+const afRaceByOutcome = d3.rollups(
+  raleighStops,
+  v => v.length,
+    d => d.race,
+    d => d.outcome
+).flatMap(([race, outcomes]) =>
+  outcomes.map(([outcome, count]) => ({race, outcome, count}))
+)
+
+const afRaceByOutcomeUpdated = afRaceByOutcome.map(
+ (stop) => {
+   let af = stop.count
+   stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+   stop.raceAndReason = stop.race + "-" + stop.outcome
+   return stop
+ }
 )
 ```
-<p class="codeblock-caption">
-  Interactive Map output of Outcomes by <code>race</code>.
-</p>
+We see that black drivers are **3.4** times more likely than white drivers to receive a warning compared to white ones, **2.9** times more likely to recieve a citation, and more than ***4*** times more likely to be arrested. But how might this data have varied over time? Have outcomes stayed consistent or fluctuated
 
-```js
-raceOutcome
-```
-Here we see that black drivers are arrested at a substantially higher clip than white ones, 
-(data).
 
 ### 2.1 Outcomes by Time
 
-But how might this information vary by time? Have racially-motivated outcomes become more or less punitive over the years between 2011-2015? 
-
 ```js
+const filteredOutcome = raleighStops.filter(d => d.outcome === "NA")
 const outcomeRaceDate = twoLevelRollUpFlatMap (
   filteredOutcome, 
   "datetime",
@@ -222,14 +234,14 @@ const outcomeRaceDate = twoLevelRollUpFlatMap (
 const percBands = view(
   Inputs.range([2, 8], {step: 1, label: "# of Bands for Horizon Chart"})
 )
-```
-
-```js
+const maxByOutcome = d3.rollup(
+  outcomeRaceDate,
+  v => d3.max(v, d => d.af),
+  d => d.outcome
+)
 const step = d3.max(outcomeRaceDate, (d) => d.af) / percBands.value
 console.log(step)
-```
 
-```js
 Plot.plot({
   height: 720,
   x: { axis: "top" },
@@ -257,7 +269,6 @@ Plot.plot({
   ]
 })
 ```
-
 ## Part 3: Reason For Stop By Outcome and Race
 
 Through an analysis of each of these categories, we start to see some patterns. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered severity compared to other reasons for stop represented in our dataset, such as driving while impaired, how many of each resulted in arrests or citations for black and white drivers? 
