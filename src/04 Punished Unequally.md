@@ -220,55 +220,41 @@ We see that black drivers are **3.4** times more likely than white drivers to re
 ### 2.1 Outcomes by Time
 
 ```js
-const filteredOutcome = raleighStops.filter(d => d.outcome === "NA")
-const outcomeRaceDate = twoLevelRollUpFlatMap (
+//filter data
+const filteredOutcome = raleighStops.filter(d => d.outcome == "NA")
+//two level roll up
+const outcomeTime = twoLevelRollUpFlatMap (
   filteredOutcome, 
-  "datetime",
   "outcome",
+  "datetime",
   "af"
 )
 
-```
-
-```js
 const percBands = view(
   Inputs.range([2, 8], {step: 1, label: "# of Bands for Horizon Chart"})
 )
-const maxByOutcome = d3.rollup(
-  outcomeRaceDate,
-  v => d3.max(v, d => d.af),
-  d => d.outcome
-)
-const step = d3.max(outcomeRaceDate, (d) => d.af) / percBands.value
-console.log(step)
+
+const step = d3.max(outcomeTime, (d) => d.af) / percBands
 
 Plot.plot({
-  height: 720,
-  x: { axis: "top" },
-  y: { domain: [0, step], axis: null },
-  color: {
-    type: "ordinal",
-    scheme: "Greens",
-    label: "Reason For Stops by date",
-    tickFormat: i => ((i + 1) * step).toLocaleString("en"),
-    legend: true
-  },
-  facet: {
-    fy: "outcome"
-  },
-  marks: [
-    ...d3.range(percBands.value).map(band =>
-      Plot.areaY(outcomeRaceDate, {
-        x: "datetime",
-        y: d => Math.max(0, d.af - band * step),
-        fill: band,
-        sort: "datetime",
-        clip: true
-      })
-    )
-  ]
+ height: 720,
+ x: {axis: "top"},
+ y: {domain: [0, step], axis: null},
+ fy: {axis: true, domain: outcomeTime.map((d) => d.outcome), padding: 0.05},
+ color: {
+   type: "ordinal",
+   scheme: "Greens",
+   label: "Rac",
+   tickFormat: (i) => ((i + 1) * step).toLocaleString("en"),
+   legend: true
+ },
+ marks: [
+   d3.range(percBands).map((band) => Plot.areaY(outcomeTime, {x: "datetime", y: (d) => (d.af - band * step), fy: "outcome", fill: band, sort: "outcome", clip: true})),
+   Plot.axisFy({frameAnchor: "left", dx: -28, fill: "currentColor", textStroke: "white", label: null})
+ ]
 })
 ```
+
 ## Part 3: Reason For Stop By Outcome and Race
 
 Through an analysis of each of these categories, we start to see some patterns. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered severity compared to other reasons for stop represented in our dataset, such as driving while impaired, how many of each resulted in arrests or citations for black and white drivers? 
