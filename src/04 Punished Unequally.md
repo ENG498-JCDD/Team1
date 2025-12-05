@@ -1,6 +1,6 @@
 # H3: Punished Unequally: An Outcomes Based Analysis
 ```js
-import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops} from "./utils/utilsH1.js";
+import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops,addDateAndTimeFeatures,getRace} from "./utils/utilsH1.js";
 ```
 ## Overview
 
@@ -20,6 +20,11 @@ Let's investigate the data to find out!
 ## Load the data
 ```js
 const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true})
+```
+
+```js
+// Add date and time features
+const updatedRaleighStops = addDateAndTimeFeatures(raleighStops)
 ```
 
 <p class="codeblock-caption">
@@ -196,6 +201,10 @@ As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary
 Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
+raleighStops
+```
+
+```js
 const afRaceByOutcome = d3.rollups(
   raleighStops,
   v => v.length,
@@ -220,27 +229,61 @@ We see that black drivers are **3.4** times more likely than white drivers to re
 ### 2.1 Outcomes by Time
 
 ```js
-//filter data
-const filteredOutcome = raleighStops.filter(d => d.outcome == "NA")
-//two level roll up
-const outcomeTime = twoLevelRollUpFlatMap (
-  filteredOutcome, 
-  "outcome",
-  "datetime",
+// Filter data and used data with new date and time features
+const filteredOutcome = updatedRaleighStops.filter(d => {
+    if ((d.outcome != "NA") && (d.race != "unknown") && (d.race != "other")) {
+      return d
+    }
+  }
+)
+
+// Combine race and outcome
+const raceOutcomesCombined = filteredOutcome.map(
+ (stop) => {
+   stop.race_and_outcome = stop.race + "-" + stop.outcome
+   return stop
+ }
+)
+
+// Group and count by day of year + race and outcome
+const outcomeTime = twoLevelRollUpFlatMap(
+  raceOutcomesCombined,
+  "day_of_year",
+  "race_and_outcome",
   "af"
 )
 
+// Add normalized counts
+const normalizedOutcomeTime = outcomeTime.map(
+  (stop) => {
+    // Parse out race value in the new combined column
+    let raceCheck = getRace(stop.race_and_outcome)
+    // Add normalized counts
+    stop.normalizedAF = stop.af / raleighPopRatios.get(raceCheck)
+
+    return stop
+ }
+)
+```
+
+```js
+// Viewed Inputs need their own scripting blocks
 const percBands = view(
   Inputs.range([2, 8], {step: 1, label: "# of Bands for Horizon Chart"})
 );
+```
 
-const step = d3.max(outcomeTime, (d) => d.af) / percBands;
+```js
+const step = d3.max(outcomeTime, (d) => d.normalizedAF) / percBands;
+```
 
+```js
+// Best to provide Plots their own block too
 Plot.plot({
- height: 720,
+//  height: 720,
  x: {axis: "top"},
  y: {domain: [0, step], axis: null},
- fy: {axis: null, domain: outcomeTime.map((d) => d.outcome), padding: 0.05},
+ fy: {axis: null, domain: outcomeTime.map((d) => d.race_and_outcome), padding: 0.05},
  color: {
    type: "ordinal",
    scheme: "Greens",
@@ -249,7 +292,7 @@ Plot.plot({
    legend: true
  },
  marks: [
-   d3.range(percBands).map((band) => Plot.areaY(outcomeTime, {x: "datetime", y: (d) => (d.af - band * step), fy: "outcome", fill: band, sort: "outcome", clip: true})),
+   d3.range(percBands).map((band) => Plot.areaY(outcomeTime, {x: "day_of_year", y: (d) => (d.normalizedAF - band * step), fy: "race_and_outcome", fill: band, sort: "day_of_year", clip: true})),
    Plot.axisFy({frameAnchor: "left", dx: -28, fill: "currentColor", textStroke: "white", label: null})
  ]
 })
