@@ -376,3 +376,65 @@ Plot.plot({
   ]
 })
 ```
+
+
+
+Overview plot
+
+```js
+// Group ALL stops (all years, all data) by hour and race
+const overviewStopsByHourRace = twoLevelRollUpFlatMap(
+  stopsWithDateTime,
+  "hour",
+  "race",
+  "count"
+)
+
+// Sort by hour (0-23)
+const overviewStopsByHourRaceSorted = overviewStopsByHourRace.slice().sort((a, b) => a.hour - b.hour)
+```
+
+```js
+Plot.plot({
+  title: "Traffic Stop Patterns by Hour and Race (All Data)",
+  width: 1000,
+  height: 500,
+  marginLeft: 80,
+  marginBottom: 80,
+  marginTop: 40,
+  marginRight: 150,
+  grid: true,
+  
+  x: {
+    label: "Hour of Day",
+    domain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+  },
+  
+  y: {
+    label: "Absolute Frequency (Number of Stops)",
+    grid: true
+  },
+  
+  color: {
+    legend: true,
+    domain: ["black", "white", "hispanic", "asian/pacific islander", "other"],
+    range: ["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728", "#9467bd"]
+  },
+  
+  marks: [
+    Plot.ruleY([0]),
+    
+    Plot.lineY(
+      overviewStopsByHourRaceSorted,
+      {
+        x: "hour",
+        y: "count",
+        stroke: "race",
+        strokeWidth: 2.5,
+        tip: true,
+        title: d => `${d.race}: ${d.count} stops at hour ${d.hour}`
+      }
+    )
+  ]
+})
+```
