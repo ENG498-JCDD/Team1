@@ -235,471 +235,144 @@ Plot.plot({
 ```
 
 
+Visualization for the argument of Veil of darkness:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Visualization 2: Daylight vs Darkness comparison
-
-Step 1: Group the data
 
 ```js
-// Group stops by light condition and race
-const stopsByLightRace = twoLevelRollUpFlatMap(
-  stopsWithDateTime,
-  "light_condition",
-  "race",
+// Filter to 2015, Black drivers, January OR August
+const stops2015BlackJanAug = stopsWithDateTime.filter(
+  (d) => {
+    if (d.year === 2015 && d.race === "black" && (d.month === 1 || d.month === 8)) {
+      return true
+    }
+  }
+)
+```
+
+```js
+// 2-level rollup: hour > month
+const afByHourMonth = twoLevelRollUpFlatMap(
+  stops2015BlackJanAug,
+  "hour",
+  "month",
   "count"
 )
 ```
 
 ```js
-// Check the output
-stopsByLightRace
-```
-
-Step 2: Calculate Percentage
-
-```js
-// Calculate percentages for each light condition
-const lightConditionComparison = []
-
-// Loop through Daylight and Darkness
-const conditions = ["Daylight", "Darkness"]
-
-for (const condition of conditions) {
-  
-  // Get stops for this condition
-  const stopsForCondition = stopsByLightRace.filter(d => d.light_condition === condition)
-  
-  // Find Black and White counts
-  let blackCount = 0
-  let whiteCount = 0
-  
-  for (const row of stopsForCondition) {
-    if (row.race === "black") {
-      blackCount = row.count
-    }
-    if (row.race === "white") {
-      whiteCount = row.count
+// January line (month 1, hours 17-21)
+const januaryEvening = afByHourMonth.filter(
+  (d) => {
+    if (d.month == 1 && d.hour >= 16 && d.hour <= 23) {
+      return true
     }
   }
-  
-  // Calculate total and percentages
-  const totalCount = blackCount + whiteCount
-  
-  const blackPercentage = (blackCount / totalCount) * 100
-  const whitePercentage = (whiteCount / totalCount) * 100
-  
-  lightConditionComparison.push({
-    condition: condition,
-    race: "Black",
-    percentage: blackPercentage,
-    count: blackCount,
-    total: totalCount
-  })
-  
-  lightConditionComparison.push({
-    condition: condition,
-    race: "White",
-    percentage: whitePercentage,
-    count: whiteCount,
-    total: totalCount
-  })
-}
-```
+)
 
-```js
-// Check the output
-lightConditionComparison
-```
-
-Step 3: Visualization
-
-```js
-import {html} from "npm:htl"
-```
-
-<div style="font-family: sans-serif; max-width: 600px;">
-  <h3>Daylight vs Darkness: Stop Rate Comparison</h3>
-  <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-    <thead>
-      <tr style="background: #f0f0f0;">
-        <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Light Condition</th>
-        <th style="padding: 12px; text-align: center; border: 1px solid #ddd; color: #ff7f0e;">Black Drivers (%)</th>
-        <th style="padding: 12px; text-align: center; border: 1px solid #ddd; color: #1f77b4;">White Drivers (%)</th>
-        <th style="padding: 12px; text-align: center; border: 1px solid #ddd;">Difference</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Daylight</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd; font-size: 18px; color: #ff7f0e;">52.8%</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd; font-size: 18px; color: #1f77b4;">47.2%</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">5.6 pp</td>
-      </tr>
-      <tr style="background: #f9f9f9;">
-        <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">Darkness</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd; font-size: 18px; color: #ff7f0e;">59.2%</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd; font-size: 18px; color: #1f77b4;">40.8%</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">18.4 pp</td>
-      </tr>
-      <tr style="background: #fff3cd; font-weight: bold;">
-        <td style="padding: 12px; border: 1px solid #ddd;">Change</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd; color: #ff7f0e;">+6.4 pp ↑</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd; color: #1f77b4;">-6.4 pp ↓</td>
-        <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">—</td>
-      </tr>
-    </tbody>
-  </table>
-  <p style="margin-top: 20px; color: #666; font-size: 14px;">pp = percentage points</p>
-</div> 
-
-
-
-
-
-Visualization 3: Twilight Period
-
-
-```js
-// Add 30-minute time bin to each stop
-for (const stop of stopsWithDateTime) {
-  const hour = stop.hour
-  const minute = stop.minute
-  
-  // Determine which 30-minute bin
-  let timeBin
-  
-  if (minute < 30) {
-    // First half of the hour (e.g., 5:00-5:29)
-    timeBin = `${hour}:00 to ${hour}:29`
-  } else {
-    // Second half of the hour (e.g., 5:30-5:59)
-    timeBin = `${hour}:30 to ${hour}:59`
+// August line (month 8, hours 17-21)
+const augustEvening = afByHourMonth.filter(
+  (d) => {
+    if (d.month == 8 && d.hour >= 16 && d.hour <= 23) {
+      return true
+    }
   }
-  
-  stop.time_bin = timeBin
-}
-```
-
-```js
-// Check a few examples
-stopsWithDateTime.slice(0, 5)
-```
-
-```js
-// Filter to evening hours only (17-21 = 5pm to 9pm)
-const eveningStops = stopsWithDateTime.filter(
-  d => d.hour >= 17 && d.hour <= 21
 )
 ```
 ```js
-// Group by time_bin, light_condition, and race
-const eveningByTimeBinLightRace = threeLevelRollUpFlatMap(
-  eveningStops,
-  "time_bin",
-  "light_condition",
-  "race",
-  "count"
-)
-```
-```js
-// Check the output
-eveningByTimeBinLightRace
+// Create new sorted arrays
+const januaryEveningSorted = januaryEvening.slice().sort((a, b) => a.hour - b.hour)
+
+const augustEveningSorted = augustEvening.slice().sort((a, b) => a.hour - b.hour)
 ```
 
 ```js
-// Calculate Black driver percentage for each time bin and light condition
-const eveningBlackPercentages = []
-
-// Create list of all time bins in order
-const timeBins = [
-  "17:00 to 17:29", "17:30 to 17:59",
-  "18:00 to 18:29", "18:30 to 18:59",
-  "19:00 to 19:29", "19:30 to 19:59",
-  "20:00 to 20:29", "20:30 to 20:59",
-  "21:00 to 21:29", "21:30 to 21:59"
-]
-
-// Loop through each time bin
-for (const timeBin of timeBins) {
+// Calculate percentages for January
+for (const row of januaryEveningSorted) {
+  // Calculate total stops for ALL January evening hours
+  const januaryTotal = d3.sum(januaryEveningSorted, d => d.count)
   
-  // Loop through Daylight and Darkness
-  for (const condition of ["Daylight", "Darkness"]) {
-    
-    // Get stops for this time bin and condition
-    const stopsForCell = eveningByTimeBinLightRace.filter(
-      d => d.time_bin === timeBin && d.light_condition === condition
-    )
-    
-    // Find Black and White counts
-    let blackCount = 0
-    let whiteCount = 0
-    
-    for (const row of stopsForCell) {
-      if (row.race === "black") {
-        blackCount = row.count
-      }
-      if (row.race === "white") {
-        whiteCount = row.count
-      }
-    }
-    
-    // Calculate percentage
-    const totalCount = blackCount + whiteCount
-    
-    if (totalCount > 0) {
-      const blackPercentage = (blackCount / totalCount) * 100
-      
-      eveningBlackPercentages.push({
-        time_bin: timeBin,
-        condition: condition,
-        black_percentage: blackPercentage,
-        total_stops: totalCount
-      })
-    }
-  }
+  // Calculate percentage for this hour
+  row.percentage = (row.count / januaryTotal) 
 }
-```
-```js
-// Check the output
-eveningBlackPercentages
+
+// Calculate percentages for August  
+for (const row of augustEveningSorted) {
+  // Calculate total stops for ALL August evening hours
+  const augustTotal = d3.sum(augustEveningSorted, d => d.count)
+  
+  // Calculate percentage for this hour
+  row.percentage = (row.count / augustTotal)
+}
 ```
 
 ```js
 Plot.plot({
-  title: "Percent Stops of Black Drivers: Daylight vs Darkness",
+  title: "Black Driver Stops: January vs August (2015)",
   width: 1000,
   height: 500,
   marginLeft: 80,
+  marginBottom: 40,
+  marginTop: 10,
   marginRight: 250,
-  marginBottom: 100,
-  grid: true,
-  
-  x: {
-    label: "Time Window",
-    tickRotate: -45
-  },
-  
-  y: {
-    label: "Percentage of Stops that are Black Drivers (%)",
-    domain: [40, 65],
-    grid: true
-  },
-  
-  marks: [
-    Plot.ruleY([0]),
-    
-    // Daylight line (solid)
-    Plot.lineY(
-      eveningBlackPercentages.filter(d => d.condition === "Daylight"),
-      {
-        x: "time_bin",
-        y: "black_percentage",
-        stroke: "#000",
-        strokeWidth: 2.5,
-        marker: "circle"
-      }
-    ),
-    
-    // Darkness line (dashed)
-    Plot.lineY(
-      eveningBlackPercentages.filter(d => d.condition === "Darkness"),
-      {
-        x: "time_bin",
-        y: "black_percentage",
-        stroke: "#000",
-        strokeWidth: 2.5,
-        strokeDasharray: "8,4",
-        marker: "circle"
-      }
-    ),
-    
-    // Dots with tooltips
-    Plot.dot(eveningBlackPercentages, {
-      x: "time_bin",
-      y: "black_percentage",
-      fill: "#000",
-      r: 5,
-      tip: true,
-      title: d => `${d.time_bin} (${d.condition}): ${d.black_percentage.toFixed(1)}%`
-    })
-  ]
-})
-```
-
-
-
-
-
-
-
-
-
-
-<!-- Step 1: 
-
-```js
-// Filter to twilight period only (hours 18-21)
-const twilightStops = stopsWithDateTime.filter(d => d.twilight_period === true)
-```
-
-```js
-// Group by hour, light condition, and race
-const twilightByHourLightRace = threeLevelRollUpFlatMap(
-  twilightStops,
-  "hour",
-  "light_condition",
-  "race",
-  "count"
-)
-```
-
-```js
-// Check the output
-twilightByHourLightRace
-```
-
-Step 2: Calculate Black Driver Percentage
-
-```js
-// Calculate Black driver percentage for each hour and light condition
-const twilightBlackPercentages = []
-
-// Loop through hours 18-21
-const twilightHours = [18, 19, 20, 21]
-
-for (const hour of twilightHours) {
-  
-  // Loop through Daylight and Darkness
-  for (const condition of ["Daylight", "Darkness"]) {
-    
-    // Get stops for this hour and condition
-    const stopsForCell = twilightByHourLightRace.filter(
-      d => d.hour === hour && d.light_condition === condition
-    )
-    
-    // Find Black and White counts
-    let blackCount = 0
-    let whiteCount = 0
-    
-    for (const row of stopsForCell) {
-      if (row.race === "black") {
-        blackCount = row.count
-      }
-      if (row.race === "white") {
-        whiteCount = row.count
-      }
-    }
-    
-    // Calculate percentage
-    const totalCount = blackCount + whiteCount
-    
-    if (totalCount > 0) {
-      const blackPercentage = (blackCount / totalCount) * 100
-      
-      twilightBlackPercentages.push({
-        hour: hour,
-        condition: condition,
-        black_percentage: blackPercentage,
-        total_stops: totalCount
-      })
-    }
-  }
-}
-```
-
-```js
-// Check the output
-twilightBlackPercentages
-```
-
-Step 3: Visualization
-
-```js
-Plot.plot({
-  title: "Black Driver Stop Rates: Daylight vs Darkness by Hour",
-  width: 900,
-  height: 500,
-  marginLeft: 80,
-  marginRight: 250,
-  marginBottom: 80,
   grid: true,
   
   x: {
     label: "Hour of Day",
-    labelAnchor: "center",
-    domain: [18, 19, 20, 21],
-    ticks: [18, 19, 20, 21]
+    domain: [16, 17, 18, 19, 20, 21, 22, 23, 0]
   },
   
   y: {
-    label: "Percentage of Stops that are Black Drivers (%)",
-    domain: [50, 65],
-    grid: true
+    label: "percNA",
+    percent: true,  
   },
   
   marks: [
     Plot.ruleY([0]),
     
-    // Daylight line (solid)
     Plot.lineY(
-      twilightBlackPercentages.filter(d => d.condition === "Daylight"),
+      augustEveningSorted,
       {
         x: "hour",
-        y: "black_percentage",
-        stroke: "#2c7bb6",
-        strokeWidth: 3,
-        marker: "circle"
+        y: "percentage",  
+        stroke: "black",
+        tip: true
       }
     ),
     
-    // Darkness line (dashed)
     Plot.lineY(
-      twilightBlackPercentages.filter(d => d.condition === "Darkness"),
+      januaryEveningSorted,
       {
         x: "hour",
-        y: "black_percentage",
-        stroke: "#d7191c",
-        strokeWidth: 3,
+        y: "percentage",  
+        stroke: "black",
         strokeDasharray: "8,4",
-        marker: "circle"
+        tip: true
+      }
+    ),
+    Plot.text(
+      [{x: 23, y: 0.18}],
+      {
+        x: "x",
+        y: "y",
+        text: ["August (Summer)"],
+        fill: "black",
+        fontSize: 12,
+        dx: 55
       }
     ),
     
-    // Dots with tooltips
-    Plot.dot(twilightBlackPercentages, {
-      x: "hour",
-      y: "black_percentage",
-      fill: d => d.condition === "Daylight" ? "#2c7bb6" : "#d7191c",
-      r: 6,
-      tip: true,
-      title: d => `Hour ${d.hour} (${d.condition}): ${d.black_percentage.toFixed(1)}%`
-    })
+    // Text label for January
+    Plot.text(
+      [{x: 23, y: 0.20}],
+      {
+        x: "x",
+        y: "y",
+        text: ["January (Winter)"],
+        fill: "black",
+        fontSize: 12,
+        dx: 55
+      }
+    )
   ]
 })
-``` -->
+```
