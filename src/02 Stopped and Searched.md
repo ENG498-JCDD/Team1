@@ -729,12 +729,3 @@ Plot.plot({
 The visualization reveals a critical mismatch between search rates and contraband discovery rates. Black drivers show a hit rate of ${blackHitRate.toFixed(1)}%, while White drivers show ${whiteHitRate.toFixed(1)}%, meaning contraband is found 1.3 times more often when Black drivers are searched. However, recall from Part 2 that Black drivers are searched at ${blackSearchRate.toFixed(1)}% compared to White drivers at ${whiteSearchRate.toFixed(1)}%, representing a 2.2 times higher search rate.
 If searches were truly evidence based and unbiased, these two ratios should align. The fact that Black drivers are searched 2.2 times more often but their hit rate is only 1.3 times higher suggests that the threshold for conducting searches is lower for Black drivers. Officers appear more willing to search Black drivers based on weaker evidence, leading to more searches overall but not proportionally more contraband discoveries. This is what policing researchers call the "outcome test" for discrimination. When a group is searched more frequently but shows only modestly higher hit rates, it indicates those searches are less justified on average.
 The data tells a clear story. The 2.2x search rate disparity far exceeds the 1.3x hit rate disparity, providing strong evidence that racial bias, not legitimate law enforcement concerns, drives who gets searched during traffic stops in Raleigh.
-
-
-
-
-
-
-```js
-raleighStops[0]
-```
