@@ -1,78 +1,76 @@
 ```js
 import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops} from "./utils/utilsH1.js"
 ```
-
-
 ```js
 // Load the data
 const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true})
 ```
-
 ```js
 const stopsWithDateTime = []
 
 for (const stop of raleighStops) {
   const dateObject = new Date(stop.datetime)
+  const year = dateObject.getFullYear()
+  const month = dateObject.getMonth() + 1
+  const hour = dateObject.getHours()
+  const minute = dateObject.getMinutes()
   
+  // Determine daylight condition
+  let daylight
+  
+  // Peak summer (June-July): Daylight until 9pm
+  if (month == 6 || month == 7) {
+    daylight = hour < 21
+  }
+  // Early/late summer (May, August): Daylight until 8pm
+  else if (month == 5 || month == 8) {
+    daylight = hour < 20
+  }
+  // Winter (Nov-Feb): Dark by 6pm
+  else if (month == 11 || month == 12 || month == 1 || month == 2) {
+    daylight = hour < 18
+  }
+  // Spring/Fall (Mar-Apr, Sep-Oct): 7pm cutoff
+  else {
+    daylight = hour < 19
+  }
+  
+  // Determine light condition
+  let light_condition
+  if (daylight == true) {
+    light_condition = "Daylight"
+  } else {
+    light_condition = "Darkness"
+  }
+  
+  // Determine twilight period
+  let twilight_period
+  if (hour >= 18 && hour <= 21) {
+    twilight_period = true
+  } else {
+    twilight_period = false
+  }
+  
+  // Push the COMPLETE object with ALL fields
   stopsWithDateTime.push({
     id: stop.id,
     datetime: stop.datetime,
     race: stop.race,
     sex: stop.sex,
     search_conducted: stop.search_conducted,
-    year: dateObject.getFullYear(),
-    month: dateObject.getMonth() + 1,  // 1-12
-    hour: dateObject.getHours(),  // 0-23
-    minute: dateObject.getMinutes()  // 0-59
+    year: year,
+    month: month,
+    hour: hour,
+    minute: minute,
+    light_condition: light_condition,
+    twilight_period: twilight_period
   })
-}
-```
-
-```js
-for (const stop of stopsWithDateTime) {
-  let daylight
-  
-  // Peak summer (June-July): Daylight until 9pm
-  if (stop.month == 6 || stop.month == 7) {
-    daylight = stop.hour < 21
-  }
-  // Early/late summer (May, August): Daylight until 8pm
-  else if (stop.month == 5 || stop.month == 8) {
-    daylight = stop.hour < 20
-  }
-  // Winter (Nov-Feb): Dark by 6pm
-  else if (stop.month == 11 || stop.month == 12 || stop.month == 1 || stop.month == 2) {
-    daylight = stop.hour < 18
-  }
-  // Spring/Fall (Mar-Apr, Sep-Oct): 7pm cutoff
-  else {
-    daylight = stop.hour < 19
-  }
-  
-  // Add the light condition field
-  if (daylight == true) {
-    stop.light_condition = "Daylight"
-  } else {
-    stop.light_condition = "Darkness"
-  }
-}
-```
-
-```js
-// Add twilight period flag to each stop
-for (const stop of stopsWithDateTime) {
-  if (stop.hour >= 18 && stop.hour <= 21) {
-    stop.twilight_period = true
-  } else {
-    stop.twilight_period = false
-  }
 }
 ```
 
 ## Overview of Traffic Stop Patterns:
 
 This visualization shows the overall pattern of traffic stops accross all racial groups throughout a 24 hour period.
-
 ```js
 // Group ALL stops by hour and race
 const overviewStopsByHourRace = twoLevelRollUpFlatMap(
@@ -85,11 +83,10 @@ const overviewStopsByHourRace = twoLevelRollUpFlatMap(
 // Sort by hour
 const overviewStopsByHourRaceSorted = overviewStopsByHourRace.slice().sort((a, b) => a.hour - b.hour)
 ```
-
 ```js
 Plot.plot({
   title: "Traffic Stop Patterns by Hour and Race (All Data)",
-  width: 1000,
+  width: 900,
   height: 500,
   marginLeft: 80,
   marginBottom: 80,
@@ -132,7 +129,6 @@ Plot.plot({
 ```
 
 ## Seasonal Variation by Hour for the Veil of Darkness Theory
-
 ```js
 // Filter to Black drivers in winter OR summer months, and adding season field
 const stopsBlackWinterSummer = []
@@ -151,7 +147,6 @@ for (const stop of stopsWithDateTime) {
   }
 }
 ```
-
 ```js
 // 2-level rollup: hour > season 
 const stopsByHourSeason = twoLevelRollUpFlatMap(
@@ -161,7 +156,6 @@ const stopsByHourSeason = twoLevelRollUpFlatMap(
   "count"
 )
 ```
-
 ```js
 // Winter line (season "Winter", hours 16-23)
 const winterEvening = stopsByHourSeason.filter(
@@ -181,13 +175,11 @@ const summerEvening = stopsByHourSeason.filter(
   }
 )
 ```
-
 ```js
 // Sort by hour
 const winterEveningSorted = winterEvening.slice().sort((a, b) => a.hour - b.hour)
 const summerEveningSorted = summerEvening.slice().sort((a, b) => a.hour - b.hour)
 ```
-
 ```js
 // Calculating percentages for Winter
 for (const row of winterEveningSorted) {
@@ -201,7 +193,6 @@ for (const row of summerEveningSorted) {
   row.percentage = row.count / summerTotal
 }
 ```
-
 ```js
 // Combining both arrays into one using for loops
 const combinedSeasons = []
@@ -214,7 +205,6 @@ for (const row of winterEveningSorted) {
   combinedSeasons.push(row)
 }
 ```
-
 ```js
 Plot.plot({
   title: "Black Driver Stops: Winter vs Summer (2011-2015)",
@@ -311,19 +301,21 @@ const stopPercentages = blackWhiteOnly.map(
 - **Mode**: ${(d3.mode(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
 
 #### Spread
-**Range**: ${d3.min(blackWhiteOnly, d => d.percentage)} to ${d3.max(blackWhiteOnly, d => d.percentage)}, (or ${(d3.min(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}% to ${(d3.max(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}%).
+- **Range**: ${d3.min(blackWhiteOnly, d => d.percentage)} to ${d3.max(blackWhiteOnly, d => d.percentage)}, (or ${(d3.min(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}% to ${(d3.max(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}%).
 
-**Variance of traffic stops**: ${d3.variance(stopPercentages).toFixed(10)}
+- **Variance of traffic stops**: ${d3.variance(stopPercentages).toFixed(10)}
 
-**Standard deviation of traffic stops**: On average, all traffic stops per hour deviate from the mean by <strong>${(100 * d3.deviation(stopPercentages)).toFixed(2)}%</strong>.
+- **Standard deviation of traffic stops**: On average, all traffic stops per hour deviate from the mean by <strong>${(100 * d3.deviation(stopPercentages)).toFixed(2)}%</strong>.
+
+
 ```js
 Plot.plot({
   title: "Traffic Stop Distribution by Hour, Race, and Light Condition",
   width: 1000,
   height: 500,
   marginLeft: 80,
-  marginBottom: 80,
-  marginTop: 60,
+  marginBottom: 60,
+  marginTop: 30,
   marginRight: 150,
   grid: true,
   
@@ -344,8 +336,7 @@ Plot.plot({
   },
   
   marks: [
-    Plot.ruleY([0]),
-    
+
     // Mean line
     Plot.ruleY([d3.mean(blackWhiteOnly, d => d.percentage)], {
       stroke: "gray",
@@ -362,7 +353,6 @@ Plot.plot({
         fill: d => d.race == "black" ? "#ff7f0e" : "#1f77b4",
         r: 5,
         tip: true,
-        title: d => `Hour ${d.hour}, ${d.race}, ${d.light_condition}: ${(d.percentage * 100).toFixed(2)}%`
       }
     )
   ]
@@ -382,131 +372,78 @@ Plot.plot({
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- ## Traffic Stops per Hour Statistics (Black & White Drivers)
-
-
 ```js
-import {rollups} from "npm:d3-array";
 
-// Do the rollup manually to see the nested structure
-const rawRollup = rollups(
-  stopsWithDateTime,
-  (v) => v.length,
-  d => d.hour,
-  d => d.race,
-  d => d.light_condition
-)
+// Adding category field to each stop based on reason_for_stop
+const stopsWithCategory = []
+
+for (const stop of raleighStops) {
+  // Only include Black and White drivers
+  if (stop.race == "black" || stop.race == "white") {
+    
+    let category
+    
+    // Category 1: Serious/Moving Violations
+
+    if (stop.reason_for_stop == "Speed Limit Violation" || stop.reason_for_stop == "Stop Light/Sign Violation" || stop.reason_for_stop == "Safe Movement Violation" || stop.reason_for_stop == "Driving While Impaired") {
+      category = "Serious Violations"
+    }
+
+    // Category 2: Minor/Equipment Violations
+
+    else if (stop.reason_for_stop == "Vehicle Regulatory Violation" || stop.reason_for_stop == "Vehicle Equipment Violation") { category = "Equipment Violations" }
+
+    // Category 3: Discretionary/Other
+
+    else {
+      category = "Discretionary Stops"
+    }
+    
+    const dateObject = new Date(stop.datetime)
+    
+    stopsWithCategory.push({
+      race: stop.race,
+      category: category,
+      hour: dateObject.getHours()
+    })
+  }
+}
 ```
 
-```js
-// Look at ONE hour's data structure
-// Find hour 20 specifically (we know it should have both daylight and darkness)
-const hour20Data = rawRollup.find(d => d[0] === 20)
-```
-```js
-// Expand it to see the nested structure
-hour20Data
-```
-
-
 
 ```js
-const stopsByHourRaceLight = threeLevelRollUpFlatMap(
-  stopsWithDateTime,
+// Three-level rollup: hour > race > category
+const stopsByHourRaceCategory = threeLevelRollUpFlatMap(
+  stopsWithCategory,
   "hour",
   "race",
-  "light_condition",
+  "category",
   "count"
 )
 ```
 
 ```js
-// Check if it worked
-stopsByHourRaceLight.slice(0, 3).map(d => ({
-  hour: d.hour,
-  race: d.race,
-  light_condition: d.light_condition,
-  count: d.count
-}))
-```
-
-
-
-```js
-const grandTotal = d3.sum(
-  stopsByHourRaceLight,
-  (d) => {
-    if (d.race === "black" || d.race === "white") {
-      return d.count
-    }
-  }
-)
-
-const reducedStopsData = []
-
-for (const row of stopsByHourRaceLight) {
-  if (row.race === "black" || row.race === "white") {
-    reducedStopsData.push({
-      hour: row.hour,
-      race: row.race,
-      light_condition: row.light_condition,
-      count: row.count,
-      percentage: row.count / grandTotal
-    })
-  }
+const heatmapCategoryData = []
+for (const row of stopsByHourRaceCategory) {
+  const combinedCategory = row.race + " - " + row.category
+  
+  heatmapCategoryData.push({
+    hour: row.hour,
+    category: combinedCategory,
+    count: row.count
+  })
 }
-
-const blackWhiteOnly = reducedStopsData
-
-const stopPercentages = blackWhiteOnly.map(
-  (d) => {
-    if (isNaN(d.percentage) === false) {
-      return d.percentage
-    }
-    else {
-      return 0
-    }
-  }
-)
 ```
-
-
-
-#### Location
-- **Average mean**: ${(d3.mean(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
-- **Median**: ${(d3.median(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
-- **Mode**: ${(d3.mode(blackWhiteOnly, d => d.percentage) * 100).toFixed(2)}%
-
-#### Spread
-- **Range**: ${d3.min(blackWhiteOnly, d => d.percentage)} - ${d3.max(blackWhiteOnly, d => d.percentage)}, (or ${(d3.min(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}% - ${(d3.max(blackWhiteOnly, d => d.percentage)*100).toFixed(2)}%).
-
-**Variance of traffic stops**: ${d3.variance(stopPercentages).toFixed(10)}
-
-**Standard deviation of traffic stops**: On average, all traffic stops per hour deviate from the mean by <strong>${(100 * d3.deviation(stopPercentages)).toFixed(2)}%</strong>.
 
 ```js
 Plot.plot({
-  title: "Traffic Stop Distribution by Hour, Race, and Light Condition",
+  title: "Traffic Stop Categories by Hour, Race, and Violation",
   width: 1000,
-  height: 500,
-  marginLeft: 80,
-  marginBottom: 80,
-  marginTop: 60,
-  marginRight: 150,
-  grid: true,
+  height: 600,
+  marginLeft: 200,
+  marginBottom: 60,
+  marginTop: 20,
+  marginRight: 50,
   
   x: {
     label: "Hour of Day",
@@ -514,58 +451,47 @@ Plot.plot({
   },
   
   y: {
-    label: "Percentage",
-    percent: true
+    label: null,
+    domain: [
+      "black - Serious Violations",
+      "black - Equipment Violations",
+      "black - Discretionary Stops",
+      "white - Serious Violations",
+      "white - Equipment Violations",
+      "white - Discretionary Stops"
+    ]
   },
   
   color: {
+    scheme: "Viridis",
     legend: true,
-    domain: ["black", "white"],
-    range: ["#ff7f0e", "#1f77b4"]
+    label: "Number of Stops"
   },
   
   marks: [
-    // Mean line
-    Plot.ruleY([d3.mean(blackWhiteOnly, d => d.percentage)], {
-      stroke: "gray",
-      strokeWidth: 2,
-      strokeDasharray: "4,4"
-    }),
-    
-    // Dots for each data point
-    Plot.dot(
-      blackWhiteOnly,
+    Plot.cell(
+      heatmapCategoryData,
       {
         x: "hour",
-        y: "percentage",
-        fill: d => d.race === "black" ? "#ff7f0e" : "#1f77b4",  // Explicit colors!
-        r: 5,
+        y: "category",
+        fill: "count",
         tip: true,
-        title: d => `Hour ${d.hour}, ${d.race}, ${d.light_condition}: ${(d.percentage * 100).toFixed(2)}%`
+      }
+    ),
+    
+    Plot.text(
+      heatmapCategoryData,
+      {
+        x: "hour",
+        y: "category",
+        text: d => d.count,
+        fill: "white",
+        fontSize: 9
       }
     )
   ]
 })
+
 ```
 
 
-
-```js
-// Test the function on a small subset
-const testData = stopsWithDateTime.filter(d => d.hour === 20 && d.race === "black")
-```
-
-```js
-const testRollup = threeLevelRollUpFlatMap(
-  testData,
-  "hour",
-  "race", 
-  "light_condition",
-  "count"
-)
-```
-
-```js
-// Check the result
-testRollup
-``` -->
