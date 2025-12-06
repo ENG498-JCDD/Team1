@@ -7,10 +7,16 @@ export default {
   // all pages will be listed in alphabetical order. Listing pages explicitly
   // lets you organize them into sections and have unlisted pages.
   pages: [
+<<<<<<< Updated upstream
     {name: "Setting the Scene", path: "/01 Setting the Scene"},
     {name: "Stopped and Searched", path: "/02 Stopped and Searched"},
     {name: "Hidden in Darkness", path: "/03 Hidden in Darkness"},
     {name: "Punished Unequally", path: "/04 Punished Unequally"},
+=======
+    {name: "Stopped and Searched", path: "/01 Stopped and Searched"},
+    {name: "Hidden in Darkness", path: "/03 Hidden in Darkness"},
+    {name: "Punished Unequally", path: "/03 Punished Unequally"},
+>>>>>>> Stashed changes
     {name: "What the Data Reveals", path: "/05 What the Data Reveals"},
   ],
 
