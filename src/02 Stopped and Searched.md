@@ -660,7 +660,7 @@ Now let's compare search rates from Part 2 with the contraband discovery rates (
 const blackSearchRate = searchRatesByRace.find(d => d.race == "black").search_rate
 const whiteSearchRate = searchRatesByRace.find(d => d.race == "white").search_rate
 
-// Extract hit rates for Black and White from our calculations above
+
 const blackHitRate = hitRatesForPlot.find(d => d.race == "black").hit_rate
 const whiteHitRate = hitRatesForPlot.find(d => d.race == "white").hit_rate
 
