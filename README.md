@@ -1,15 +1,14 @@
-# Enter Title of Project Here
-
-**NOTE FOR NEW PROJECT**: Don't forget to update the `observablehq.config.js` file. Delete this paragraph, when completed.
+# Stopped: An Analysis of Traffic-Stops by Race in Raleigh, North Carolina
 
 - Wyatt Blanchette
 - Nazifa Chowdhury
 - Hail Gabrielle Zulueta
 
-Brief description of the project
+**Brief description of the project:**
+
 We're going to look at traffic stop data from 2011-2015 and create meaningful groupings centered around race as an independent variable. We hope to supplement our findings with a qualitative analysis of news or other reports on the subject, and also synthesize existing research.
 
-- [Project Tracker]()
+- [Project Tracker](https://docs.google.com/spreadsheets/d/16qobn6Ep0cxRRt-bd_gIIW38FVJruRaM/edit?gid=1372465741#gid=1372465741)
   - **WARNING!**: Be sure to just share the direct URL, since I have added everyone in the class to the Drive folder overall. So, do not provide the "Share" link. We want to make sure the information remains secure.
 
 ## About the Data
