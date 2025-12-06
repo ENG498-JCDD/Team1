@@ -40,4 +40,16 @@ The data comes from the [Stanford Open Policing Project](https://openpolicing.st
 
 The project was launched in 2014 and officially began collecting data from states in 2015. They have standardized over 200 million traffic stops since their inceptions but have largely ceased their work as statewide collection efforts have lapsed. In addition to this data, the project also offers tutorials on analysis strategies and a centralized portal dedicated to news publications related to the traffic stops.
 
+```js
+// Get all US counties
+const us = await fetch(import.meta.resolve("npm:us-atlas/counties-10m.json")).then((r) => r.json())
+const counties = topojson.feature(us, us.objects.counties)
 
+// Wake County FIPS code is 37183
+const wakeCounty = counties.features.find((d) => d.id === "37183")
+```
+
+```js
+// Look at one stop to see what geographic columns exist
+raleighStops[0]
+```
