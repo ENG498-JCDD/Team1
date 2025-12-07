@@ -18,7 +18,7 @@ Do Black drivers experience discriminatory treatment during traffic stops in Ral
 
 ## Research Question
 
-Do Black drivers experience disproportionate stop and search rates compared to White drivers in Raleigh, and if so, are these disparities justified by contraband discovery patterns?
+Do Black drivers experience disproportionate stop and search rates compared to White drivers in Raleigh? And if so, are these disparities justified by contraband discovery patterns?
 
 ## Loading the Data
 
@@ -86,7 +86,7 @@ const raleighPopulationByRace = [
 
 ### The Disparity Revealed
 
-Now comes the critical comparison. The visualizations below show Raleigh's actual population composition on the left, and the racial breakdown of traffic stops on the right. If policing were proportional and unbiased, these two charts should look nearly identical.
+Now comes the critical comparison. The visuals below show Raleigh's population by race on the left, and the racial breakdown of traffic stops on the right. If policing were proportional and unbiased, these two charts should look nearly identical.
 
 Do they?
 ```js
@@ -197,9 +197,14 @@ const trafficStopsPlot = Plot.plot({
 
 ### Understanding the Numbers
 
-The side by side comparison reveals a stark disparity. White drivers make up 60.2% of the population but only 40.8% of traffic stops, while Black drivers represent 29.3% of the population yet account for 48.8% of stops. This means Black drivers are stopped at 1.66 times their population proportion.
+The side by side comparison reveals a stark disparity:
 
-In practical terms, Black drivers in Raleigh are 66% more likely to be stopped than random chance would predict, while White drivers are 32% less likely. This 38.9 percentage point swing cannot be explained by population differences alone and raises serious questions about whether race influences policing decisions.
+ - White drivers make up **60.2%** of the population but only **40.8%** of traffic stops 
+ - While Black drivers represent **29.3%** of the population yet account for **48.8%** of stops. 
+ 
+ This means Black drivers are stopped at **1.66x** times their population proportion.
+
+Black drivers in Raleigh are 66% more likely to be stopped than random chance would predict, while White drivers are 32% less likely to be stopped, a whopping 38.9 percentage point difference. This initial issue raises questions about whether race influences policing decisions.
 
 ### Testing for Consistency
 
@@ -268,15 +273,21 @@ Plot.plot({
 })
 ```
 
-The time series reveals an important finding. The racial disparity is remarkably stable across all five years. Black drivers consistently experienced the highest number of stops throughout the entire 2011 to 2015 period. While all groups followed similar trends (declining from 2011 to 2013, then increasing through 2015), the gap between Black and White drivers remained persistent. This is not a temporary anomaly or a single year outlier. This is a structural pattern embedded in traffic stop practices.
+The time series highlights a crucial insight: racial disparities in traffic stops are stable and persistent. Across the entire 2011–2015 period, Black drivers consistently faced the highest number of stops.
+
+
+All racial groups followed similar overall trends, a decline from 2011 to 2013, followed by an increase through 2015. Yet the gap between Black and white drivers never closed.
+
+ This consistency shows that the disparity is not a temporary anomaly or the result of a single unusual year. *Instead, it reflects a structural pattern embedded in Raleigh’s traffic stop practices as a whole*.
+
 
 ### What This Means
 
 We've now established three critical findings:
 
-First, Black drivers are stopped at rates far exceeding their population share (48.8% of stops versus 29.3% of population).
+First, Black drivers are stopped at rates far exceeding their population share (**48.8%** of stops versus **29.3%** of population).
 
-Second, White drivers are stopped at rates below their population share (40.8% of stops versus 60.2% of population).
+Second, White drivers are stopped at rates below their population share (**40.8%** of stops versus **60.2%** of population).
 
 Third, this pattern is consistent across all five years in our dataset, indicating a systemic issue rather than a temporary problem.
 
