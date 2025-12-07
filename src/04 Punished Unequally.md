@@ -35,8 +35,8 @@ const updatedRaleighStops = addDateAndTimeFeatures(raleighStops)
 raleighStops
 ```
 
-## Normalizing The Data
-Before we begin, let's normalize our data based on population. As of the most recent census data, whites accounted for 59.1 percent of Raleigh's total population and the black population represented only 21.9 percent. Let's adjust our data to reflect this, by mapping racial categories to population ratios and then outputting the data grouped by race with normalized frequencies.
+## Normalize The Data
+Before we begin, let's normalize our data based on population. As of the most recent census data, whites accounted for 59.1 percent of Raleigh's total population and the black population represented only 21.9 percent. Let's adjust our data to reflect this by mapping racial categories to population ratios and then outputting the data grouped by race with normalized frequencies.
 
 ```js
 const raleighPop = 131023
@@ -201,10 +201,7 @@ As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary
 Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
-raleighStops
-```
-
-```js
+// Roll Up Data
 const afRaceByOutcome = d3.rollups(
   raleighStops,
   v => v.length,
@@ -213,7 +210,7 @@ const afRaceByOutcome = d3.rollups(
 ).flatMap(([race, outcomes]) =>
   outcomes.map(([outcome, count]) => ({race, outcome, count}))
 )
-
+//map normalized data
 const afRaceByOutcomeUpdated = afRaceByOutcome.map(
  (stop) => {
    let af = stop.count
@@ -222,11 +219,59 @@ const afRaceByOutcomeUpdated = afRaceByOutcome.map(
    return stop
  }
 )
+
+// filter "other" and "un"
+const afRaceByOutcomeFiltered = afRaceByOutcomeUpdated.filter(d => d.race != "other" && d.race != "unknown" && d.outcome != "NA" )
 ```
-We see that black drivers are **3.4** times more likely than white drivers to receive a warning compared to white ones, **2.9** times more likely to recieve a citation, and more than ***4*** times more likely to be arrested. But how might this data have varied over time? Have outcomes stayed consistent or fluctuated
+```js
+Plot.plot({
+  title: "Stop Outcomes by Race (Normalized by Population)",
+  width: 1200,
+  height: 600,
+
+  // One panel per outcome
+  facet: {
+    data: afRaceByOutcomeFiltered,
+    x: "outcome",
+    label: "Outcome"
+  },
+
+  marginLeft: 120,
+  marginBottom: 60,
+  grid: true,
+
+  x: {
+    label: "Normalized Count",
+    grid: true,
+    domain: [0, d3.max(afRaceByOutcomeUpdated, d => d.normalizedCount) * 1.1]
+  },
+
+  y: {
+    label: "Race",
+    domain: [...new Set(afRaceByOutcomeFiltered.map(d => d.race))]
+  },
+
+  marks: [
+    Plot.ruleX([0]),
+    Plot.dot(afRaceByOutcomeFiltered, {
+      x: "normalizedCount",
+      y: "race",
+      fill: "#9c2007",
+      r: 7,
+      tip: true
+    })
+  ]
+})
+```
+
+
+We see that black drivers are **3.4** times more likely than white drivers to receive a warning compared to white ones, **2.9** times more likely to recieve a citation, and more than ***4*** times more likely to be arrested. But how might this data fluctuate? Are there certain times of the year when arrests and citations might be more frequent than warnings, and vice versa?
 
 
 ### 2.1 Outcomes by Time
+In the following Horizon Chart, we see that most outcomes for all races tend to spike in the spring and early summer months. This would make sense due to warmer weather, longer days, and therefore more drivers on the road, but might there be another motive at play?
+
+**Police quotas** requiring specific numbers of tickets/arrests are currently [illegal](https://www.ncleg.gov/EnactedLegislation/Statutes/PDF/BySection/Chapter_20/GS_20-187.3.pdf) in the state of North Carolina, a law which was *not* active during the time period our dataset represents. Quotas tie officer's pay to volume of arrests and citations, rather than performance metrics, and extra money is typically paid out in the form of *holiday bonuses*. With the increased prevalence of traffic stops in the summer months and more officers dedicated to roadside enforcement, as opposed to home visits and incident response, the summer months represent the primary time officers can achieve these bonuses. Currently, police quotas are still legal in [24](https://www.fwd.us/wp-content/uploads/2025/06/JAM-Quotas.pdf) states.
 
 ```js
 // Filter data and used data with new date and time features
@@ -299,122 +344,23 @@ Plot.plot({
 ```
 
 ## Part 3: Reason For Stop By Outcome and Race
-
-Through an analysis of each of these categories, we start to see some patterns. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered severity compared to other reasons for stop represented in our dataset, such as driving while impaired, how many of each resulted in arrests or citations for black and white drivers? 
+Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered *severity* compared to other reasons for stop represented in our dataset, let's focus on these two categories.
 
 
 ```js
-const stopsWithReasonOutcome = raleighStops.filter(
-d => d.outcome != "NA" && d.reason_for_stop != "NA"
+const filteredReasons = raleighStops.filter(d =>
+d.reason_for_stop == "Vehicle Regulatory Violation" && d.reason_for_stop == "Speed Limit Violation"
 )
 
 const raceOutcomeReason = threeLevelRollUpFlatMap(
-  stopsWithReasonOutcome,
+  filteredReasons,
   "race",
   "outcome",
   "reason_for_stop",
   "af"
 )
 ```
-```js
-// Reducer function for reason_for_stop arrest or citation
-// Returns count if arrest or citation was made for VRV or SLV
-const reasonReducer = (d) => {
-  const vrv = d.reason_for_stop == "Vehicle Regulatory Violation"
-  const slv = d.reason_for_stop == "Speed Limit Violation"
 
-  const arrestOrCitation = d.outcome == "arrest" || d.outcome == "citation"
-
- if ((vrv || slv) && arrestOrCitation) {
-  return d.count
-} else {
-  return 0
-}
-}
-
-// Reducer function for reason_for_stop warning
-// Returns count if warning was issued for VRV or SLV
-const warningReducer = (d) => {
-  const vrv = d.reason_for_stop == "Vehicle Regulatory Violation"
-  const slv = d.reason_for_stop == "Speed Limit Violation"
-
-  const isWarning = d.outcome == "warning"
-
-  if ((vrv || slv) && isWarning) {
-    return d.count
-  } else {
-    return 0
-  }
-}
-```
-
-```js
-// Get all unique races from the data
-const uniqueRaceList = getUniquePropListBy(
-  raceOutcomeReason,
-  "race"
-)
-
-// Reducer functions objectified
-const reducerFuncs = [
-  {
-    type: "Arrest or Citation",
-    func: reasonReducer
-  },
-  {
-    type: "Warning",
-    func: warningReducer
-  }
-]
-```
-```js
-// Create array for results
-const arrestOrCitationResults = []
-
-// Loop through all RACE values
-for (const raceValue of uniqueRaceList) {
-
-  // Loop through reducer functions
-  for (const testorObj in reducerFuncs) {
-
-    const totalSearchesForRace = d3.sum(
-      raceSearchContraband,
-      (d) => {
-        if (d.race == raceValue && d.search_conducted == "TRUE") {
-          return d.count
-        }
-      }
-    )
-
-    // Calculate the sum for FOUND or NOT_FOUND using the reducer function
-    const summedUpLevel = d3.sum(
-      raceSearchContraband,
-      (d) => {
-        if (d.race == raceValue && d.search_conducted == "TRUE") {
-          const xTotalToSum = reducerFuncs[testorObj]["func"](d)
-          return xTotalToSum
-        }
-      }
-    )
-
-    // Push results
-    contrabandPercResults.push({
-      race: raceValue,
-      contraband_status: reducerFuncs[testorObj]["type"],
-      count: summedUpLevel,
-      total_searches: totalSearchesForRace,
-      percentage: summedUpLevel / totalSearchesForRace,
-    })
-  }
-}
-```
-
-
-
-
-```js
-console.log(outcomeRaceDate)
-```
 
 
 ## Key Findings
