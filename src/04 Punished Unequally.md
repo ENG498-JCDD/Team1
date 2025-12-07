@@ -349,8 +349,7 @@ Through an analysis of each of these categories both by frequency and time, we h
 
 ```js
 const filteredReasons = raleighStops.filter(d =>
-d.reason_for_stop == "Vehicle Regulatory Violation" || d.reason_for_stop == "Speed Limit Violation"
-)
+(d.reason_for_stop == "Vehicle Regulatory Violation" || d.reason_for_stop == "Speed Limit Violation") && d.outcome != "NA")
 
 const raceOutcomeReason = threeLevelRollUpFlatMap(
   filteredReasons,
@@ -360,7 +359,48 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
   "af"
 )
 ```
+```js
+  Plot.plot({
+    height: 500,
+    width: 1000,
+    marginLeft: 60,
+    marginBottom: 60,
+    fx: {
+      label: "Reason for Stop"
+    },
+    x: {
+      label: "Race"
+    },
+    y: { label: "Count" },
+    color: { label: "Outcome",
+    field: "outcome",
+    legend: true,
+    },
 
+    marks: [
+      Plot.barY(
+        filteredReasons,
+        Plot.groupX(
+          { y: "count" },
+          {
+            fx: "reason_for_stop",   
+            x: "race",             
+            fill: "outcome",
+            tooltip: d => ({
+            "Reason for Stop": d.reason_for_stop,
+            "Race": d.race,
+            "Outcome": d.outcome,
+            "Count": 1
+          })
+          }
+        )
+      ),
+      Plot.ruleY([0])
+    ]
+  })
+
+
+```
 
 
 ## Key Findings
