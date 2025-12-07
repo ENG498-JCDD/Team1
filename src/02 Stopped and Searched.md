@@ -289,7 +289,7 @@ First, Black drivers are stopped at rates far exceeding their population share (
 
 Second, White drivers are stopped at rates below their population share (**40.8%** of stops versus **60.2%** of population).
 
-Third, this pattern is consistent across all five years in our dataset, indicating a systemic issue rather than a temporary problem.
+Third, this pattern is consistent across all five years in our dataset, meaning this is a systemic issue rather than a problem arising randomly.
 
 But being stopped more frequently is only one dimension of the story. The next critical question is whether Black and White drivers are treated differently once they are stopped. Specifically, are Black drivers more likely to be searched? And if so, do these searches yield contraband at rates that would justify the disparity?
 
@@ -297,9 +297,9 @@ That's what we'll examine next.
 
 ## Part 2: Search Rates by Race
 
-Now let's investigate the key question: Are Black drivers searched at higher rates than White drivers?
+Now, let's investigate the key question: Are Black drivers searched at higher rates than White drivers?
 
-Here's why this matters. Being stopped more often is one thing. But if Black drivers are also being searched at disproportionate rates once they're stopped, that's a whole different level of disparity. Let's find out.
+This matters because taking actions to search either a vehicle or someone's person is an entirely different situation, both figuratively and data-wise. Let's explore how to calculate and sort through these instances of privacy breach.
 
 ### Calculating Search Rates
 
@@ -397,15 +397,17 @@ Plot.plot({
 
 **Critical Finding**
 
-The chart reveals a clear pattern in how different racial groups are treated once stopped. Black drivers are searched at a rate of 4.6%, while White drivers are searched at only 2.1%. This means Black drivers are **2.2 times more likely** to be searched than White drivers during a traffic stop.
+The chart reveals a clear pattern in how different racial groups are treated once stopped. Black drivers are searched at a rate of 4.6%, while White drivers are searched at only 2.1%. This means Black drivers are **2.2x more likely** to be searched than White drivers during a traffic stop.
 
-To put this in context, remember from Part 1 that Black drivers already experience disproportionate stop rates (48.8% of stops despite being 29.3% of the population). Now we see a second layer of disparity. Even after being stopped, Black drivers face more than double the search rate of White drivers.
+To put this in context, remember from Part 1 that Black drivers already experience disproportionate stop rates (**48.8%** of stops despite being **29.3%** of the population). Now we see a second layer of disparity. Even after being stopped, Black drivers face more than double the search rate of White drivers.
 
-While the "other" category shows a higher search rate at 5.1%, this represents only a small number of stops (2.3% of all stops), making it less statistically significant for our analysis. The comparison between Black and White drivers, representing the vast majority of stops in our dataset, provides the most meaningful insight into racial disparities in search practices.
+While the "other" category shows a higher search rate at **5.1%**, this represents only a small number of stops (**2.3%** of all stops), making it less statistically significant for our analysis. 
+
+The comparison between Black and White drivers, representing the vast majority of stops in our dataset, provides the most meaningful insight into racial disparities in search practices.
 
 ### Breaking Down Search Types
 
-There are two types of searches officers can conduct. Person searches involve searching the driver's body, while vehicle searches involve searching the car. Is the racial disparity consistent across both search types?
+There are two types of searches officers can conduct; a vehicle search or a search on the driver's person. Is the racial disparity consistent across both search types?
 ```js
 const racePersonSearch = twoLevelRollUpFlatMap(
   raleighStops,
@@ -526,23 +528,27 @@ Plot.plot({
 
 **Key Observation**
 
-Here, the Black drivers appear at the far right of the plot dot chart, experiencing the highest search rates for both person searches (red dot at 4.36%) and vehicle searches (blue dot at 3.75%). White drivers, by contrast, cluster much closer to the left side of the chart, with significantly lower rates for both person searches (1.95%) and vehicle searches (1.58%).
+Here, the Black drivers appear at the far right of the plot dot chart, experiencing the highest search rates for both person searches (red dot at **4.36%**) and vehicle searches (blue dot at **3.75%**). White drivers, by contrast, cluster much closer to the left side of the chart, with significantly lower rates for both person searches (**1.95%**) and vehicle searches (**1.58%**).
 
-Notice an important detail across all racial groups. The red dots (person searches) consistently appear to the right of the blue dots (vehicle searches). This tells us that person searches happen more frequently than vehicle searches across the board. However, what matters most is not just this pattern, but the dramatic difference in where each racial group falls on the horizontal axis.
+Take note of an important detail across all racial groups. The red dots (person searches) consistently appear to the right of the blue dots (vehicle searches). 
 
-The gray lines connecting each pair of dots illustrate the gap between person and vehicle search rates for each racial group. Black drivers experience person searches at a rate 2.2 times higher than White drivers (4.36% vs 1.95%), and vehicle searches at a rate 2.4 times higher (3.75% vs 1.58%). 
+This tells us that person searches happen *more frequently* than vehicle searches across the board. However, what matters most is not just this pattern, but the dramatic difference in where each racial group falls on the horizontal axis.
+
+The gray lines connecting each pair of dots show the gap between person and vehicle search rates for each racial group. Black drivers experience person searches at a rate **2.2x** higher than White drivers (**4.36% vs 1.95%**), and vehicle searches at a rate **2.4x** higher (**3.75% vs 1.58%**). 
 
 This visualization makes the disparity unmistakable. The horizontal spread of the dots shows that not all drivers face equal treatment during traffic stops. Black drivers consistently appear on the right side of the spectrum (higher search rates), while White drivers consistently appear on the left (lower search rates). This pattern holds true for both the more invasive person searches and vehicle searches.
 
-The "other" category shows the highest person search rate, but as discussed earlier, this represents only 2.3% of all stops in our dataset, making it less statistically meaningful. The comparison between Black and White drivers, representing the vast majority of traffic stops, provides the clearest evidence of systematic racial disparity in search practices.
+The "other" category shows the highest person search rate, but as discussed earlier, this represents only **2.3%** of all stops in our dataset, making it less statistically meaningful. The comparison between Black and White drivers, representing the vast majority of traffic stops, provides the clearest evidence of systematic racial disparity in search practices.
 
 ### What This Means
 
-Black drivers face a compounding disparity. Not only are they stopped more frequently (Part 1), but once stopped, they're searched at rates 2.2 times higher than White drivers. This pattern holds across both person and vehicle searches, indicating systematic rather than isolated discrimination.
+Black drivers face a compounding disparity. Black drivers are stopped more frequently and are searched more frequently at a **2.2x** higher rate than White drivers.
 
 ## Part 3: Contraband Discovery Analysis
 
-So far, our analysis found that Black drivers are searched at significantly higher rates than White drivers. Now, here comes a critical question. When Black drivers are searched, is contraband actually found more often?
+So far, our analysis found that Black drivers are searched at significantly higher rates than White drivers.
+
+ Now, here comes a critical question. When Black drivers are searched, is contraband actually found more often?
 
 The logic behind this is simple. If searches are based on legitimate evidence, then higher search rates should correlate with higher contraband discovery rates. However, if searches are based on racial bias, then we might see higher search rates paired with similar or lower contraband discovery rates, suggesting searches lack proper justification.
 
@@ -738,5 +744,7 @@ Plot.plot({
 **Key Finding**
 
 The visualization reveals a critical mismatch between search rates and contraband discovery rates. Black drivers show a hit rate of ${blackHitRate.toFixed(1)}%, while White drivers show ${whiteHitRate.toFixed(1)}%, meaning contraband is found 1.3 times more often when Black drivers are searched. However, recall from Part 2 that Black drivers are searched at ${blackSearchRate.toFixed(1)}% compared to White drivers at ${whiteSearchRate.toFixed(1)}%, representing a 2.2 times higher search rate.
+
+
 If searches were truly evidence based and unbiased, these two ratios should align. The fact that Black drivers are searched 2.2 times more often but their hit rate is only 1.3 times higher suggests that the threshold for conducting searches is lower for Black drivers. Officers appear more willing to search Black drivers based on weaker evidence, leading to more searches overall but not proportionally more contraband discoveries. This is what policing researchers call the "outcome test" for discrimination. When a group is searched more frequently but shows only modestly higher hit rates, it indicates those searches are less justified on average.
 The data tells a clear story. The 2.2x search rate disparity far exceeds the 1.3x hit rate disparity, providing strong evidence that racial bias, not legitimate law enforcement concerns, drives who gets searched during traffic stops in Raleigh.
