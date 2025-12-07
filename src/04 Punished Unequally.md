@@ -344,12 +344,12 @@ Plot.plot({
 ```
 
 ## Part 3: Reason For Stop By Outcome and Race
-Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered *severity* compared to other reasons for stop represented in our dataset, let's focus on these two categories.
+Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered *severity* compared to other reasons for stop represented in our dataset, let's focus on these two v.
 
 
 ```js
 const filteredReasons = raleighStops.filter(d =>
-d.reason_for_stop == "Vehicle Regulatory Violation" && d.reason_for_stop == "Speed Limit Violation"
+d.reason_for_stop == "Vehicle Regulatory Violation" || d.reason_for_stop == "Speed Limit Violation"
 )
 
 const raceOutcomeReason = threeLevelRollUpFlatMap(
