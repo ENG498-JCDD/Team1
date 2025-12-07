@@ -271,7 +271,7 @@ We see that black drivers are **3.4** times more likely than white drivers to re
 ### 2.1 Outcomes by Time
 In the following Horizon Chart, we see that most outcomes for all races tend to spike in the spring and early summer months. This would make sense due to warmer weather, longer days, and therefore more drivers on the road, but might there be another motive at play?
 
-**Police quotas** requiring specific numbers of tickets/arrests are currently [illegal](https://www.ncleg.gov/EnactedLegislation/Statutes/PDF/BySection/Chapter_20/GS_20-187.3.pdf) in the state of North Carolina, a law which was *not* active during the time period our dataset represents. Quotas tie officer's pay to volume of arrests and citations, rather than performance metrics, and extra money is typically paid out in the form of *holiday bonuses*. With the increased prevalence of traffic stops in the summer months and more officers dedicated to roadside enforcement, as opposed to home visits and incident response, the summer months represent the primary time officers can achieve these bonuses. Currently, police quotas are still legal in [24](https://www.fwd.us/wp-content/uploads/2025/06/JAM-Quotas.pdf) states.
+**Police quotas** requiring specific numbers of tickets/arrests are currently [illegal](https://www.ncleg.gov/EnactedLegislation/Statutes/PDF/BySection/Chapter_20/GS_20-187.3.pdf) in the state of North Carolina, a law which was *not* active during the time period our dataset represents. Quotas tie officer's pay to volume of arrests and citations, rather than performance metrics, and extra money is typically paid out in the form of *holiday bonuses*. With the increased prevalence of traffic stops in the summer months, and more officers dedicated to roadside enforcement as opposed to home visits and incident response, the summer months represent the primary time officers achieve these bonuses. Currently, police quotas are still legal in [24](https://www.fwd.us/wp-content/uploads/2025/06/JAM-Quotas.pdf) states.
 
 ```js
 // Filter data and used data with new date and time features
@@ -344,7 +344,7 @@ Plot.plot({
 ```
 
 ## Part 3: Reason For Stop By Outcome and Race
-Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered *severity* compared to other reasons for stop represented in our dataset, let's focus on these two v.
+Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered *severity* compared to other reason represented in our dataset, let's focus on these two variables for now.
 
 
 ```js
@@ -390,7 +390,6 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
             "Reason for Stop": d.reason_for_stop,
             "Race": d.race,
             "Outcome": d.outcome,
-            "Count": 1
           })
           }
         )
