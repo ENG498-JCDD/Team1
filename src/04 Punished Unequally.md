@@ -227,7 +227,7 @@ const afRaceByOutcomeFiltered = afRaceByOutcomeUpdated.filter(d => d.race != "ot
 Plot.plot({
   title: "Stop Outcomes by Race (Normalized by Population)",
   width: 1200,
-  height: 600,
+  height: 300,
 
   // One panel per outcome
   facet: {
@@ -274,13 +274,11 @@ In the following Horizon Chart, we see that most outcomes for all races tend to 
 **Police quotas** requiring specific numbers of tickets/arrests are currently [illegal](https://www.ncleg.gov/EnactedLegislation/Statutes/PDF/BySection/Chapter_20/GS_20-187.3.pdf) in the state of North Carolina, a law which was *not* active during the time period our dataset represents. Quotas tie officer's pay to volume of arrests and citations, rather than performance metrics, and extra money is typically paid out in the form of *holiday bonuses*. With the increased prevalence of traffic stops in the summer months, and more officers dedicated to roadside enforcement as opposed to home visits and incident response, the summer months represent the primary time officers achieve these bonuses. Currently, police quotas are still legal in [24](https://www.fwd.us/wp-content/uploads/2025/06/JAM-Quotas.pdf) states.
 
 ```js
-// Filter data and used data with new date and time features
-const filteredOutcome = updatedRaleighStops.filter(d => {
-    if ((d.outcome != "NA") && (d.race != "unknown") && (d.race != "other")) {
-      return d
-    }
-  }
+const filteredOutcome = updatedRaleighStops.filter(d =>
+  d.outcome !== "NA" &&
+  (d.race == "white" || d.race == "black")
 )
+
 
 // Combine race and outcome
 const raceOutcomesCombined = filteredOutcome.map(
