@@ -40,8 +40,10 @@ The data comes from the [Stanford Open Policing Project](https://openpolicing.st
 
 The project was launched in 2014 and officially began collecting data from states in 2015. They have standardized over 200 million traffic stops since their inceptions but have largely ceased their work as statewide collection efforts have lapsed. In addition to this data, the project also offers tutorials on analysis strategies and a centralized portal dedicated to news publications related to the traffic stops.
 
+#### County Wide Data(?)
+Another issue we'd like to address pertains to the areas in which data has been collected. Although the dataset ostensibly represents all of Wake County, there are very few stops outside of townships other than Raleigh. This is illustrated in the geo-spatial map below, where you can see that only 10 non-Raleigh stops exist- a number starkly disproportionate to Raleigh's demographic composition.
 
-## Distribution of Traffic Stops Across Wake County Townships (2011-2015)
+### Distribution of Traffic Stops Across Wake County Townships (2011-2015)
 
 ```js
 const townships = FileAttachment("data/townships.geojson").json()
