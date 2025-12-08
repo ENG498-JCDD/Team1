@@ -90,12 +90,13 @@ const flatStopsByRace = raleighStopsByRace.map(
 ```js
 Plot.plot({
  title: "Raleigh Traffic Stops by Race",
- width: 1100,
+ width: 900,
+ height: 500,
+ marginLeft: 80,
+ marginBottom: 80,
+ marginTop: 40,
+ marginRight: 250,
  grid: true,
- marginLeft: 100,
- marginRight: 0,
- marginBottom: 60,
- marginTop: 60,
  x: {label: "Race", padding: 0},
  y: {label: "Normalized Stop Freq", padding: 0},
  color: {legend: true},
@@ -117,7 +118,6 @@ Plot.plot({
 })
 
 ```
-
 ## Part 1: Reason For Stop
 
 Since chapter two *Stopped and Searched* has already outlined the racial compostion of our dataset, I will begin with investigating if the reasons black drivers are getting pulled over are comparable to white ones. This will involve an analysis of the *reason_for_stop* category. 
@@ -163,12 +163,13 @@ const afRaceByReasonUpdated = afRaceByReason.map(
 ```js
 Plot.plot({
  title: "Reason for Stop Racial Breakdown",
- width: 1100,
+width: 1050,
+ height: 500,
+ marginLeft: 80,
+ marginBottom: 80,
+ marginTop: 40,
+ marginRight: 250,
  grid: true,
- marginLeft: 100,
- marginRight: 0,
- marginBottom: 60,
- marginTop: 60,
  label: null,
  color: {legend: true},
  x: {label: "Reason for Stop", padding: 0},
@@ -220,7 +221,7 @@ const afRaceByOutcomeUpdated = afRaceByOutcome.map(
  }
 )
 
-// filter "other" and "un"
+// filter "other" and "unknown"
 const afRaceByOutcomeFiltered = afRaceByOutcomeUpdated.filter(d => d.race != "other" && d.race != "unknown" && d.outcome != "NA" )
 ```
 ```js
@@ -236,9 +237,13 @@ Plot.plot({
     label: "Outcome"
   },
 
-  marginLeft: 120,
-  marginBottom: 60,
-  grid: true,
+    width: 900,
+    height: 500,
+    marginLeft: 80,
+    marginBottom: 80,
+    marginTop: 40,
+    marginRight: 250,
+    grid: true,
 
   x: {
     label: "Normalized Count",
@@ -321,9 +326,14 @@ const step = d3.max(outcomeTime, (d) => d.normalizedAF) / percBands;
 ```
 
 ```js
-// Best to provide Plots their own block too
 Plot.plot({
-//  height: 720,
+width: 900,
+ height: 500,
+ marginLeft: 80,
+ marginBottom: 80,
+ marginTop: 40,
+ marginRight: 250,
+ grid: true,
  x: {axis: "top"},
  y: {domain: [0, step], axis: null},
  fy: {axis: null, domain: outcomeTime.map((d) => d.race_and_outcome), padding: 0.05},
@@ -342,7 +352,7 @@ Plot.plot({
 ```
 
 ## Part 3: Reason For Stop By Outcome and Race
-Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of Vehicle Regulatory and Speed Limit Violations, plus lowered *severity* compared to other reason represented in our dataset, let's focus on these two variables for now.
+Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of *Vehicle Regulatory* and *Speed Limit Violations*, plus lowered *severity* compared to other reason represented in our dataset, let's focus on these two variables for now.
 
 
 ```js
@@ -359,10 +369,13 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
 ```
 ```js
   Plot.plot({
+    width: 1200,
     height: 500,
-    width: 1000,
-    marginLeft: 60,
-    marginBottom: 60,
+    marginLeft: 80,
+    marginBottom: 80,
+    marginTop: 40,
+    marginRight: 250,
+    grid: true,
     fx: {
       label: "Reason for Stop"
     },
@@ -396,6 +409,11 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
     ]
   })
 
+
+
+
+```
+From this grouped bar chart, we see that black drivers **24.3** more likely to receive a citation for a Vehicle Regulatory Violation but actually less likely to be issued one for a Speed Limit Violation. However, perhaps the more important statistic is the arrests category.
 
 ```
 
