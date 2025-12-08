@@ -418,3 +418,4 @@ From this grouped bar chart, we see that black drivers **24.3** more likely to r
 Numbers that suggest the need for immediate change in the way traffic stops are conducted.
 
 ## Key Findings
+This analysis reveals clear evidence of racial bias in police enforcement of the most common two types of traffic stops. Considering arrests are the most harmful outcome and may impact detainees for the rest of their lives, there is a strong motivation for policy reform displayed here. Has such reform been enacted in the state of NC and Raleigh following the years of this study? That is a topic for another study, but, in short, the answer seems to be mixed.
