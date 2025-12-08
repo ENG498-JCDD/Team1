@@ -55,6 +55,9 @@ TPC can build capacity in this data design context through contributions. Notabl
 
 ## What's Next?
 ### Policy Proposals?
+Currently, police officers are free to conduct **warrantless** searches of vehicles as long as they are deemed to have probable cause. Under federal law these searches are most frequently evaluated via the **reasonable person** standard, in which it is question if a prudent person were to believe a crime has occurred. This gives officers free reign to exercise warrantless searches based on arbitrary distinctions, completely contingent on what **prudent** may mean in certain localities or police departements. One suggestion may be for a more codified and rigid legal definitions of probable cause.
 
+Another proposal may be to move away from the **investigatory stop**. Traffic stops are intended to promote traffic safety, not to investigate crime. It is clear from our findings that the application of traffic stops in trying to curtail non-traffic related crime has resulted in unfair biases.
 
-### Open Data Policy
+Lastly, police quotas must be abolished federally. Thankfully they have been ruled illegall in NC, but this does not prove that they may still exist illegally within smaller departments. Any evidence of these quotas existing, either formally or informally, muse be deemed illegall. 
+
