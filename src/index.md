@@ -4,8 +4,6 @@
 
 The aim of our project is to uncover biases within police traffic stops in North Carolina. There has been much research linking traffic stops to race within the state, most notably *Suspect Citizens: What 20 Million Traffic Stops Tell Us About Policing and Race* by Dr. Frank Baumgartner. Our data app builds on this scholarship but narrows the scope significantly, focusing on stops which occurred between 2011-2015 and which were conducted in Wake County. 
 
-<!-- Add link -->
-
 By using this sample size we hope to emphasize details, stories, and patterns which may have been missed when working with the original data set, initially comprised of stops between 2003 and 2015 in multiple NC cities and counties. Our parsing falls in line with SJ ethics emphasis on complex and multifaceted guiding principles, showing that problems like structural racism look and operate in many different forms and manifestations. As such, critical issues like marginalization and intersectional oppression may require different forms of redress based on both societal treatment but also location-based exclusion, even in situations as micro-specific as the county level.
 
 ## Problem Case Scenario
@@ -25,16 +23,11 @@ H2 - Veil of Darkness: The "Veil of Darkness" test uses natural variation in sun
 
 H3 - Outcome Disparities: Black drivers receive harsher outcomes (arrests, citations) compared to White drivers for similar violations. We analyze whether racial disparities exist not only in the decision to stop and search, but also in the consequences drivers face following a stop.
 
-<!-- The first centers around evidence found in searches, the second analyzes time of day as possible motivator for police searches, and the last examines racial-based outcomes.  -->
-
-
 ### About the Data
 
 Notably, 2016 seems to be the last year in which county-wide data on traffic stops was collected. Most of the stops in the county are also focused in Raleigh, ignoring both Cary and more rural parts of Wake County. An inital step could be therefore a call for more contemporary and comprehensive data. With these limitations in mind, We'll provide an overview of the data which we have, keeping in mind the call for more thorough collection practices.
 
 There are 24 columns present, including details about the stopped driver's age, race, and sex. The searches are split into if a search was conducted, the vehicle stopped, the reason an investigation was initiated, and whether a frisk was performed. There is also information specific to contraband, the date of the incident, and the presence of a possible citation. Notably, there is very little information about the officer, and officer's hash ids are encrypted. 
-
-<!-- confusion about this line- The searches are split into if a search was conducted, the vehicle stopped, the reason an investigation was initiated, and whether a frisk was performed. -->
 
 The data comes from the [Stanford Open Policing Project](https://openpolicing.stanford.edu/), which collects information on vehicle and pedestrain stops across the country. The data is collected by an interdisciplinary team of researchers and journalists, in hopes of combining statistical analysis practices with data journalism. The initiative is comprised of computer scientists, data scientists, and journalists, both at the student and professor level. 
 
