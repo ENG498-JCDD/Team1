@@ -1,5 +1,5 @@
-import {rollups, ascending} from "npm:d3-array";
-import {utcParse, utcFormat} from "npm:d3-time-format";
+import {rollups} from "npm:d3-array";
+import {utcFormat} from "npm:d3-time-format";
 
 /** getUniquePropListBy()
  * Goal: Create a unique list of `x` property
@@ -133,44 +133,85 @@ export const threeLevelRollUpFlatMap = (data, level1Key, level2Key, level3Key, c
   return flatTotals
 }
 
+export const normalizeLocation = (d) => {
+  /**
+   * Use .get() to retrieve the keyed varied value
+   * linked to a value that will normalize it.
+   * EXAMPLES:
+   *  - Incoming value of `"RALEOIGH, Wake County"`
+   *    will return a normed value of `"RALEIGH"`
+   *  - Incoming value of `"RA, Wake County"`
+   *    will return a normed value of `"RALEIGH"`
+  **/
+  const newNormal = LOCATIONS.get(d)
 
-// Date parsers and formatters for traffic stops data
-const parseDate = utcParse("%Y-%m-%dT%H:%MZ");
-const formatYearNumber = utcFormat("%Y");
-const formatMonthNumber = utcFormat("%m");
-const formatWeekNumber = utcFormat("%U");
+  if ( (newNormal != null) || (newNormal != "") ) {
+    return newNormal
+  }
+  else {
+    return "NOT_FOUND"
+  }
 
-export const mapDateObjectForStops = (data, dateString) => {
-  
-  // Use .map() to iterate the data and create new date properties
-  const updatedData = data.map((stop) => {
-    
-    // Create dynamic keys for new properties
-    const objField = dateString + "_obj"
-    const weekField = dateString + "_week"
-    const monthField = dateString + "_month"
-    const yearField = dateString + "_year"
-    
-    // Skip any null datetime values
-    if (stop[dateString] != null) {
-      
-      const dateObj = stop[dateString]
-      
-      // Assign the Date object
-      stop[objField] = dateObj
-      
-      // Extract and assign year, month, week as numbers
-      stop[yearField] = Number(formatYearNumber(dateObj))
-      stop[monthField] = Number(formatMonthNumber(dateObj))
-      stop[weekField] = Number(formatWeekNumber(dateObj))
-    }
-    
-    return stop
-  })
-  
-  const sortedData = updatedData.sort((a, b) => {
-    return ascending(a[dateString + "_obj"], b[dateString + "_obj"])
-  })
-  
-  return sortedData
+}
+
+export const addDateAndTimeFeatures = (data) => {
+  const yearFormatter = utcFormat("%Y");
+  const monthFormatter = utcFormat("%B");
+  const dayFormatter = utcFormat("%a %d");
+  const dayOfYearFormatter = utcFormat("%a %d");
+  const hourFormatter = utcFormat("%I");
+  const ampmFormatter = utcFormat("%p");
+
+  return data.map(d => ({
+    ...d,
+    year: yearFormatter(d.datetime),
+    month: monthFormatter(d.datetime),
+    day: dayFormatter(d.datetime),
+    day_of_year: dayOfYearFormatter(d.datetime),
+    hour: hourFormatter(d.datetime),
+    ampm: ampmFormatter(d.datetime),
+  }));
+}
+
+export const fourLevelRollUpFlatMapTime = (data, countKey) => {
+  const colTotals = d3.rollups(
+    data,
+    v => v.length,
+    d => d.race,
+    d => d.year,
+    d => d.month,
+    d => `${d.hour} ${d.ampm}`,
+    d => d.outcome
+  );
+
+  return colTotals.flatMap(l1Elem => {
+    const raceVal = l1Elem[0];
+    return l1Elem[1].flatMap(l2Elem => {
+      const yearVal = l2Elem[0];
+      return l2Elem[1].flatMap(l3Elem => {
+        const monthVal = l3Elem[0];
+        return l3Elem[1].flatMap(l4Elem => {
+          const hourVal = l4Elem[0];
+          return l4Elem[1].flatMap(l5Elem => ({
+            race: raceVal,
+            year: yearVal,
+            month: monthVal,
+            hour: hourVal,
+            outcome: l5Elem[0],
+            [countKey]: l5Elem[1]
+          }));
+        });
+      });
+    });
+  });
+}
+
+export const getRace = (raceOutcomeString) => {
+  // regex pattern for "race-outcome"
+  const reGroupString = /(.{1,})-.{1,}/gm;
+  // Find matches
+  const matches = reGroupString.exec(raceOutcomeString);
+  // Return only first group in match, which is the race category
+  const justRace = matches[1].trim();
+  return justRace
 }
