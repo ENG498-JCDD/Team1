@@ -4,7 +4,9 @@
 
 The usage of TPC in this data design app is especially emphasized with identifying variables such as **race and sex**, making it heavily applicable towards demographic work.
 
-Even farther, through our ***Stopped and Searched*** page, we can compare the race and sex with how far do traffic stop situations go. What demographics are having their vehicle searched? What demographics are having their body's searched?
+Specifically, in the defense of the user, this data design app opens up easy access to previously put away data, emphasizing an open data policy we suggested in our scenario.
+
+Even further, through our ***Stopped and Searched*** page, we can compare the race and sex with how far do traffic stop situations go. What demographics are having their vehicle searched? What demographics are having their body's searched?
 
 The information that this data design app does not only provide the public with knowledge, but increases transparency and encourages actions to keep government services **accountable.**
 
