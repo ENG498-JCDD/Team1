@@ -413,9 +413,8 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
 
 
 ```
-From this grouped bar chart, we see that black drivers **24.3** more likely to receive a citation for a Vehicle Regulatory Violation but actually less likely to be issued one for a Speed Limit Violation. However, perhaps the more important statistic is the arrests category.
+From this grouped bar chart, we see that black drivers **24.3** more likely to receive a citation for a Vehicle Regulatory Violation but actually less likely to be issued one for a Speed Limit Violation. However, perhaps the more important statistic is the arrests category, in which it is shown that black drivers are **<mark>313</mark>** perecent more likely than white drivers to be arrested for VRVs and and **<mark>122</mark>** percent more likely to be arrested for speeding infractions. 
 
-```
-
+Numbers that suggest the need for immediate change in the way traffic stops are conducted.
 
 ## Key Findings
