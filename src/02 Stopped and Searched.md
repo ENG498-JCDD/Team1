@@ -49,6 +49,14 @@ This section establishes our demographic baseline and examines whether traffic s
 
 First, let's establish what Raleigh's population actually looks like during our study period (2011 to 2015). We'll use official U.S. Census data that covers this exact timeframe.
 ```js
+import {InternMap} from "d3-array"
+
+```
+```js
+const stopsByRaceMap = d3.rollup(
+  raleighStops,
+  d => D.length,
+  d => d.race
 const stopsByRace = oneLevelRollUpFlatMap(
   raleighStops,
   "race",
