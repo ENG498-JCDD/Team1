@@ -10,7 +10,11 @@ When normalized by population, Black drivers face 4 times the arrest rate overal
 Legal professionals can access detailed case information while academics gain comparative data to advance research. Civil rights organizations can identify patterns to support class action litigation or policy campaigns, uniting around documented disparities of 313% arrest likelihood for Vehicle Regulatory Violations rather than relying on anecdotes.
 Our analysis of police quotas opens discussion about systemic incentives driving discriminatory enforcement, despite their illegality in North Carolina. Journalists can probe departmental practices and budgetary structures. The Veil of Darkness analysis, while showing null results, demonstrates methodological transparency that builds trust and shows which analytical approaches work in different contexts.
 
+<<<<<<< HEAD
 ## Materialization: Uncovering the Conditions of Data Absence
+=======
+Hard numbers drawn from coding, such as the **48.8%** of Black drivers vs **40.8%** of White drivers stopped, allow for speculation and thoughts that may provoke a call for investigation or policy change. Furthermore, the data shows what might not be a favorable speculative stance, such as the testing of the ***Veil of Darkness***. Data from ***Punished Unequally*** shows that black drivers are **4x** more likely to be arrested at stops when data is normalized, which may impact arrestees for the rest of their lives.
+>>>>>>> e63664777bb4c8844f91988b22732a5cac97a6fc
 
 The North Carolina Bureau of Investigation offers traffic stop data only from 2020 to 2025. The years 2016 to 2020 are conspicuously absent, a gap corresponding to political transition in state leadership that suggests potential suppression or neglect during critical years.
 The dataset ostensibly represents all of Wake County, yet only 10 stops occurred outside Raleigh township out of over 337,000 total. This raises questions about data collection practices: whose communities are being recorded and whose stops are missing from official records entirely.
@@ -18,8 +22,12 @@ Officer hash IDs are encrypted, preventing identification of patterns by specifi
 
 ## Increasing User Power in the Relationship: Enabling Community-Led Solutions
 
+<<<<<<< HEAD
 Interactive visualizations allow users to explore specific questions. A community organizer can examine search patterns in their neighborhood. A legal advocate can compare outcomes for different violation types. This self-directed analysis lets communities set their own research agendas.
 Next steps should include community input on which additional variables to analyze and which visualizations are most useful. Partnerships with local organizations like Refund Raleigh and the Pretrial Reform Project could ensure the app evolves to meet community needs rather than academic interests.
+=======
+The material conditions surrounding this data reveal troubling patterns of accountability gaps. Why does the bureau of investigation for NC only offer information from [2020-2025](https://trafficstops.ncsbi.gov/Default.aspx?pageid=2)? Where is 2016-2020? Furthermore, materialization of this information gives us the chance to ask who is in charge of the data and why is it both difficult to access or sometimes missing entirely?
+>>>>>>> e63664777bb4c8844f91988b22732a5cac97a6fc
 
 ## Power through Personal Change: Building Individual Capacity for Action
 
@@ -30,7 +38,13 @@ Unencrypted officer identifiers in future datasets would enable identification o
 
 ## What's Next: Policy Proposals and Future Directions
 
+<<<<<<< HEAD
 ### Immediate Data Collection Reforms
+=======
+Individual community members gain specific capabilities through engagement with this data. A person who was searched during a traffic stop can now contextualize their experience within broader patterns, understanding that their treatment was not isolated but part of systemic bias. This knowledge can help transform personal injustice into potential for collective action and systemic.
+
+Notable contributions could be providing more information on the missing data or on variables in another data set such as the race of the officer, which were not clarified. A first step might be providing un-encrypted officer hash-id numbers.
+>>>>>>> e63664777bb4c8844f91988b22732a5cac97a6fc
 
 North Carolina must resume comprehensive, standardized statewide collection with public transparency. The missing 2016 to 2020 data should be recovered and published. Wake County must expand collection beyond Raleigh to suburban and rural townships.
 Officer identification should be available in anonymized but trackable formats. Additional variables needed include officer race, years of service, precinct assignment, and geographic beat information.
