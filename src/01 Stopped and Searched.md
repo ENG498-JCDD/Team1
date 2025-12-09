@@ -53,10 +53,6 @@ import {InternMap} from "d3-array"
 
 ```
 ```js
-const stopsByRaceMap = d3.rollup(
-  raleighStops,
-  d => D.length,
-  d => d.race
 const stopsByRace = oneLevelRollUpFlatMap(
   raleighStops,
   "race",
