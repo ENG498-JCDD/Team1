@@ -397,11 +397,7 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
             fx: "reason_for_stop",   
             x: "race",             
             fill: "outcome",
-            tooltip: d => ({
-            "Reason for Stop": d.reason_for_stop,
-            "Race": d.race,
-            "Outcome": d.outcome,
-          })
+            tip: true
           }
         )
       ),
