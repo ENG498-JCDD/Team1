@@ -8,13 +8,13 @@ The usage of TPC in this data design app is emphasized with variables such as **
 
 Applying collectivization and an open data policy with this data design app can provide not just legal professionals with information detailing their client's case, but also allow academics to utilize comparative information and visuals to think critically on issues regarding race and police force. This being done without *FOIA* requests for information, which can often take months at a time with no guarantee of un-redacted information, would be a godsend for those scouring for information on traffic stops.
 
-Hard numbers drawn from coding, such as the **48.8%** of Black drivers vs **40.8%** of White drivers stopped, allow for speculation and thoughts that may provoke a call for investigation or policy change. Furthermore, the data shows what might not be a favorable speculative stance, such as the testing of the *Veil of Darkness*. Data from ***Punished Unequally*** shows that black drivers are **4x** more likely to be arrested at stops when data is normalized, which may impact arrestees for the rest of their lives.
+Hard numbers drawn from coding, such as the **48.8%** of Black drivers vs **40.8%** of White drivers stopped, allow for speculation and thoughts that may provoke a call for investigation or policy change. Furthermore, the data shows what might not be a favorable speculative stance, such as the testing of the ***Veil of Darkness***. Data from ***Punished Unequally*** shows that black drivers are **4x** more likely to be arrested at stops when data is normalized, which may impact arrestees for the rest of their lives.
 
 One last thing that may help investigators and journalists uncover more information beyond our statistics is the fact that quotas are discussed. Despite police quotas being illegal within NC, the question itself drums up discussion about ulterior motives behind arrests.
 
 ## Materialization
 
-Materialization allows for the discussion on convenience. Why does the bureau of investigation for NC only offer information from [2020-2025](https://trafficstops.ncsbi.gov/Default.aspx?pageid=2)? Where is 2016-2020? Furthermore, materialization of this information gives us the chance to ask who is in charge of the data and why is it both difficult to access or sometimes missing?
+The material conditions surrounding this data reveal troubling patterns of accountability gaps. Why does the bureau of investigation for NC only offer information from [2020-2025](https://trafficstops.ncsbi.gov/Default.aspx?pageid=2)? Where is 2016-2020? Furthermore, materialization of this information gives us the chance to ask who is in charge of the data and why is it both difficult to access or sometimes missing entirely?
 
 For *Stopped and Searched*, data is cleaned and presented visually with audience accessibility in mind, answering direct questions about racial statistics in traffic stops. In both *Hidden in Darkness* and *Punished Unequally*, we are given the chance to look at information that stem from typical questions such as "How does time affect traffic stops?" and "What kinds of traffic stops are there? What are possible motivations for stopping people?"
 
@@ -22,7 +22,9 @@ By continuing to work on this Data Design App with perhaps more hands on deck an
 
 ## Power through Personal Change
 
-TPC can build capacity in this data design context through contributions. Notable contributions could be providing more information on the missing data or on variables in another data set such as the race of the officer, which were not clarified. A first step might be providing un-encrypted officer hash-id numbers.
+Individual community members gain specific capabilities through engagement with this data. A person who was searched during a traffic stop can now contextualize their experience within broader patterns, understanding that their treatment was not isolated but part of systemic bias. This knowledge can help transform personal injustice into potential for collective action and systemic.
+
+Notable contributions could be providing more information on the missing data or on variables in another data set such as the race of the officer, which were not clarified. A first step might be providing un-encrypted officer hash-id numbers.
 
 ## What's Next?
 

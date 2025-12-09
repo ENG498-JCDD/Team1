@@ -12,15 +12,14 @@ We're going to look at traffic stop data from 2011-2015 and create meaningful gr
   - **WARNING!**: Be sure to just share the direct URL, since I have added everyone in the class to the Drive folder overall. So, do not provide the "Share" link. We want to make sure the information remains secure.
 
 ## About the Data
-
-**`src/data/path/to/dataset.csv`**
-- **Topic**: Enter broader topic of dataset.
-- **Overview**: Enter brief description for each dataset.
-- **Source**: [Enter link to source]()
+""./data/policestops-with-townships.csv""
+****
+- **Topic**: Traffic stops in Raleigh 
+- **Overview**: Traffic stops in Raleigh conducted between 2011-2015.
+- **Source**: [Traffic Stop Data](https://openpolicing.stanford.edu/data/)
 - **Sample Row**:
   ```csv
-  enter,sample,row,here
-  1,2,3,"Hello world!"
+ 12660649,2011-01-01T17:07Z,"RALEIGH, Wake County",RALEIGH,1,24,white,male,83996705d6,FALSE,TRUE,FALSE,citation,NA,NA,NA,FALSE,FALSE,FALSE,FALSE,NA,NA,NA,Other Motor Vehicle Violation
   ```
 
 See the README for the dataset for more information.
