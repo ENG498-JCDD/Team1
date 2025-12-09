@@ -1,19 +1,17 @@
-# H3: Punished Unequally: An Outcomes Based Analysis
 ```js
 import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops,addDateAndTimeFeatures,getRace} from "./utils/utilsH1.js";
 ```
+
+# Punished Unequally: An Outcomes Based Analysis
 ## Overview
 
-This chapter provides an in-depth analysis of the outcomes black and white driver's face for traffic stops. It analyzes officer's reasons officers stop drivers in conjunction with outcomes, and looks to uncover distinct patterns in the penalties driver's may recieve for getting pulled over.
+The chapter provides an in-depth analysis of the outcomes black and white driver's face for traffic stops. It analyzes officer's reasons officers stop drivers in conjunction with outcomes, and looks to uncover distinct patterns in the penalties driver's may recieve for getting pulled over. This involves three variables in our dataset: race, reason_for_stop, and outcome.
 
-This involves three variables in our dataset: race, reason_for_stop, and outcome.
+**Our Hypothesis:** Our hypothesis is: Black drivers receive harsher outcomes than White drivers for the same violations, with fewer warnings and more arrests. This happens because officers exercise discretion based on race, escalating punishment for Black drivers. Without standardized protocols, discriminatory outcomes will persist, but objective enforcement guidelines can reduce racial-based disparities.
 
-**Hypothesis**
+## Research Question
 
-Our hypothesis, or h3, is: Black drivers receive harsher outcomes than White drivers for the same violations, with fewer warnings and more arrests. This happens because officers exercise discretion based on race, escalating punishment for Black drivers. Without standardized protocols, discriminatory outcomes will persist, but objective enforcement guidelines can reduce racial-based disparities.
-
-### Research Question
-**Are black drivers searched for similar reasons to white drivers, and are these searches jutified by contraband found?**
+Are black drivers searched for similar reasons to white drivers, and are these searches jutified by contraband found?
 
 Let's investigate the data to find out!
 
@@ -83,8 +81,6 @@ const flatStopsByRace = raleighStopsByRace.map(
     return racesList
   }
 )
-
-
 ```
 
 ```js
@@ -199,6 +195,7 @@ width: 1050,
 As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Black drivers are roughly **1.3** times more likely than white drivers to get pulled over for Vehicle Regulatory Violations, and **.7** times more likely to get pulled over for possible speeding infractions. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
+
 Next let's examine the Outcome category. This variable comprises three possibilities, including Citation, Warning, and Arrest. In our dataset the black population is once again overrepresented in each category, particularly when considering Wake County and Raleigh's racial composition.
 
 ```js
@@ -268,7 +265,6 @@ Plot.plot({
   ]
 })
 ```
-
 
 We see that black drivers are **3.4** times more likely than white drivers to receive a warning compared to white ones, **2.9** times more likely to recieve a citation, and more than ***4*** times more likely to be arrested. But how might this data fluctuate? Are there certain times of the year when arrests and citations might be more frequent than warnings, and vice versa?
 
@@ -404,10 +400,6 @@ const raceOutcomeReason = threeLevelRollUpFlatMap(
       Plot.ruleY([0])
     ]
   })
-
-
-
-
 ```
 From this grouped bar chart, we see that black drivers **24.3** more likely to receive a citation for a Vehicle Regulatory Violation but actually less likely to be issued one for a Speed Limit Violation. However, perhaps the more important statistic is the arrests category, in which it is shown that black drivers are **<mark>313</mark>** perecent more likely than white drivers to be arrested for VRVs and and **<mark>122</mark>** percent more likely to be arrested for speeding infractions. 
 

@@ -1,47 +1,33 @@
 # What the Data Reveals: Data Design seen with an Ethical Lens and through Structuralist Methods
 
-## **Defense of the User:**
-The usage of TPC in this data design app is emphasized with variables such as **race and sex**, making it applicable towards demographic-based research.
+## Defense of the User
 
-Through our ***Stopped and Searched*** page, we compare races and sexes with how far traffic stop situations go. What demographics are being searched? What demographics are having their body's searched?
+The usage of TPC in this data design app is emphasized with variables such as **race and sex**, making it applicable towards demographic-based research. Through our ***Stopped and Searched*** page, we compare races and searche rates with how far traffic stop situations go. What demographics are being searched? What demographics are having their body's searched? In the defense of the user, this data design app opens up easy access to previously put away data, consistent with the open data policy we advocate for in our scenario. The pages ***Hidden in Darkness*** and ***Punished Unequally*** show specifics, providing access to information about date respective stops and stop reasoning through a racialized lens. The information that this data design app does not only provide the public with knowledge but increases transparency and encourages actions to keep government services **accountable.**
 
-In the defense of the user, this data design app opens up easy access to previously put away data, consistent with the open data policy we advocate for in our scenario. The pages ***Hidden in Darkness*** and ***Punished Unequally*** show specifics, providing access to information about date respective stops and stop reasoning through a racialized lens.  
+## Collectivization
 
-The information that this data design app does not only provide the public with knowledge but increases transparency and encourages actions to keep government services **accountable.**
+Applying collectivization and an open data policy with this data design app can provide not just legal professionals with information detailing their client's case, but also allow academics to utilize comparative information and visuals to think critically on issues regarding race and police force. This being done without *FOIA* requests for information, which can often take months at a time with no guarantee of un-redacted information, would be a godsend for those scouring for information on traffic stops.
 
-## **Collectivization:** 
-Applying collectivization and an open data policy with this data design app can provide not just legal professionals with information detailing their client's case, but also allow academics to utilize comparative information and visuals to think critically on issues regarding race and police force. 
-
-This being done without *FOIA* requests for information, which can often take months at a time with no guarantee of un-redacted information, would be a godsend for those scouring for information on traffic stops.
-
-Hard numbers drawn from coding, such as the **48.8%** of Black drivers vs **40.8%** of White drivers stopped, allow for speculation and thoughts that may provoke a call for investigation or policy change. 
-
-Furthermore, the data shows what might not be a favorable speculative stance, such as the testing of the *Veil of Darkness*.
-
-Data from ***Punished Unequally*** shows that black drivers are **4x** more likely to be arrested at stops when data is normalized, which may impact arrestees for the rest of their lives.
+Hard numbers drawn from coding, such as the **48.8%** of Black drivers vs **40.8%** of White drivers stopped, allow for speculation and thoughts that may provoke a call for investigation or policy change. Furthermore, the data shows what might not be a favorable speculative stance, such as the testing of the *Veil of Darkness*. Data from ***Punished Unequally*** shows that black drivers are **4x** more likely to be arrested at stops when data is normalized, which may impact arrestees for the rest of their lives.
 
 One last thing that may help investigators and journalists uncover more information beyond our statistics is the fact that quotas are discussed. Despite police quotas being illegal within NC, the question itself drums up discussion about ulterior motives behind arrests.
 
-## **Materialization:**
-Materialization allows for the discussion on convenience. Why does the bureau of investigation for NC only offer information from 2020-2025? Where is 2016-2020?
+## Materialization
 
-https://trafficstops.ncsbi.gov/Default.aspx?pageid=2
+Materialization allows for the discussion on convenience. Why does the bureau of investigation for NC only offer information from [2020-2025](https://trafficstops.ncsbi.gov/Default.aspx?pageid=2)? Where is 2016-2020? Furthermore, materialization of this information gives us the chance to ask who is in charge of the data and why is it both difficult to access or sometimes missing?
 
-Furthermore, materialization of this information gives us the chance to ask who is in charge of the data and why is it both difficult to access or sometimes missing?
+For *Stopped and Searched*, data is cleaned and presented visually with audience accessibility in mind, answering direct questions about racial statistics in traffic stops. In both *Hidden in Darkness* and *Punished Unequally*, we are given the chance to look at information that stem from typical questions such as "How does time affect traffic stops?" and "What kinds of traffic stops are there? What are possible motivations for stopping people?"
 
-For ***Stopped and Searched***, data is cleaned and presented visually with audience accessibility in mind, answering direct questions about racial statistics in traffic stops. 
+By continuing to work on this Data Design App with perhaps more hands on deck and funding, this project could achieve D'Ignazio and Klein's Principle 7; Make Labor Visible. A data design app that is not only raising questions on missing information but providing comparative statistics is a result of data feminism in action. 
 
-In both ***Hidden in Darkness** and ***Punished Unequally***, we are given the chance to look at information that stem from typical questions such as "How does time affect traffic stops?" and "What kinds of traffic stops are there? What are possible motivations for stopping people?"
+## Power through Personal Change
 
-By continuing to work on this Data Design App with perhaps more hands on deck and funding, this project could achieve D'Ignazio and Klein's Principle 7; Make Labor Visible.
-
-A data design app that is not only raising questions on missing information but providing comparative statistics is a result of data feminism in action. 
-
-## **Power through Personal Change:** 
 TPC can build capacity in this data design context through contributions. Notable contributions could be providing more information on the missing data or on variables in another data set such as the race of the officer, which were not clarified. A first step might be providing un-encrypted officer hash-id numbers.
 
 ## What's Next?
+
 ### Policy Proposals?
+
 Currently, police officers are free to conduct **warrantless** searches of vehicles as long as they are deemed to have probable cause. Under federal law these searches are most frequently evaluated via the **reasonable person** standard, in which it is asked if a prudent person were to believe a crime has occurred. This gives officers free reign to exercise warrantless searches based on arbitrary distinctions, completely contingent on what **prudent** may mean in certain localities or police departements. One suggestion may therefore be for a more codified and rigid legal definition of probable cause.
 
 Another proposal may be to move away from the **investigatory stop**. Traffic stops are intended to promote traffic safety, not to investigate crime. It is clear from our findings that the application of traffic stops in trying to curtail non-traffic related crime has resulted in unfair biases.

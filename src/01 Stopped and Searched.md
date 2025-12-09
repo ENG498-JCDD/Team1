@@ -399,7 +399,7 @@ Plot.plot({
 })
 ```
 
-**Critical Finding**
+#### Critical Finding
 
 The chart reveals a clear pattern in how different racial groups are treated once stopped. Black drivers are searched at a rate of 4.6%, while White drivers are searched at only 2.1%. This means Black drivers are **2.2x more likely** to be searched than White drivers during a traffic stop.
 
@@ -429,14 +429,13 @@ const raceVehicleSearch = twoLevelRollUpFlatMap(
 )
 ```
 ```js
-// Prepare data for grouped chart
 const searchTypesByRace = []
 
 for (const raceRow of stopsByRace) {
   const raceName = raceRow.race
   const totalStopsForRace = raceRow.count
   
-  // Get person search count
+
   let personSearchesTrue = 0
   for (const searchRow of racePersonSearch) {
     if (searchRow.race == raceName && searchRow.search_person == "TRUE") {
@@ -444,7 +443,6 @@ for (const raceRow of stopsByRace) {
     }
   }
   
-  // Get vehicle search count
   let vehicleSearchesTrue = 0
   for (const searchRow of raceVehicleSearch) {
     if (searchRow.race == raceName && searchRow.search_vehicle == "TRUE") {
@@ -455,14 +453,12 @@ for (const raceRow of stopsByRace) {
   const personRate = (personSearchesTrue / totalStopsForRace) * 100
   const vehicleRate = (vehicleSearchesTrue / totalStopsForRace) * 100
   
-  // Add person search row
   searchTypesByRace.push({
     race: raceName,
     search_type: "Person Search",
     search_rate: personRate
   })
   
-  // Add vehicle search row
   searchTypesByRace.push({
     race: raceName,
     search_type: "Vehicle Search",
@@ -500,7 +496,6 @@ Plot.plot({
   marks: [
     Plot.ruleX([0]),
     
-    // Dots for each search type
     Plot.dot(searchTypesByRace, {
       x: "search_rate",
       y: "race",
@@ -509,7 +504,6 @@ Plot.plot({
       tip: true
     }),
     
-    // Lines connecting person to vehicle searches
     Plot.link(
       searchTypesByRace.filter(d => d.search_type == "Person Search"),
       {
@@ -530,7 +524,7 @@ Plot.plot({
 })
 ```
 
-**Key Observation**
+#### Key Observation
 
 Here, the Black drivers appear at the far right of the plot dot chart, experiencing the highest search rates for both person searches (red dot at **4.36%**) and vehicle searches (blue dot at **3.75%**). White drivers, by contrast, cluster much closer to the left side of the chart, with significantly lower rates for both person searches (**1.95%**) and vehicle searches (**1.58%**).
 
@@ -544,7 +538,7 @@ This visualization makes the disparity unmistakable. The horizontal spread of th
 
 The "other" category shows the highest person search rate, but as discussed earlier, this represents only **2.3%** of all stops in our dataset, making it less statistically meaningful. The comparison between Black and White drivers, representing the vast majority of traffic stops, provides the clearest evidence of systematic racial disparity in search practices.
 
-### What This Means
+#### What This Means
 
 Black drivers face a compounding disparity. Black drivers are stopped more frequently and are searched more frequently at a **2.2x** higher rate than White drivers.
 
@@ -633,7 +627,6 @@ for (const raceValue of uniqueRaceList) {
       }
     )
 
-    // Calculate the sum for FOUND or NOT_FOUND using the reducer function
     const summedUpLevel = d3.sum(
       raceSearchContraband,
       (d) => {
@@ -644,7 +637,6 @@ for (const raceValue of uniqueRaceList) {
       }
     )
 
-    // Push results
     contrabandPercResults.push({
       race: raceValue,
       contraband_status: reducerFuncs[testorObj]["type"],
@@ -656,12 +648,10 @@ for (const raceValue of uniqueRaceList) {
 }
 ```
 ```js
-// Filter for contraband FOUND only (hit rates)
 const hitRatesByRace = contrabandPercResults.filter(
   d => d.contraband_status == "FOUND"
 )
 
-// Convert to percentages for visualization
 const hitRatesForPlot = []
 for (const row of hitRatesByRace) {
   hitRatesForPlot.push({
@@ -676,8 +666,8 @@ for (const row of hitRatesByRace) {
 ### The Outcome Test
 
 Now let's compare search rates from Part 2 with the contraband discovery rates (hit rates) we just calculated. If searches are based on legitimate evidence, these two metrics should move together proportionally.
+
 ```js
-// Extract search rates for Black and White from Part 2
 const blackSearchRate = searchRatesByRace.find(d => d.race == "black").search_rate
 const whiteSearchRate = searchRatesByRace.find(d => d.race == "white").search_rate
 
@@ -685,7 +675,6 @@ const whiteSearchRate = searchRatesByRace.find(d => d.race == "white").search_ra
 const blackHitRate = hitRatesForPlot.find(d => d.race == "black").hit_rate
 const whiteHitRate = hitRatesForPlot.find(d => d.race == "white").hit_rate
 
-// Create comparison data dynamically
 const comparisonData = [
   {race: "Black", metric: "Search Rate", value: blackSearchRate},
   {race: "Black", metric: "Hit Rate", value: blackHitRate},
@@ -723,20 +712,18 @@ Plot.plot({
   marks: [
     Plot.ruleY([0]),
     
-    // Gray lines connecting the points for each race
     Plot.line(comparisonData, {
       x: "metric",
       y: "value",
       z: "race",
-      stroke: "#ccc",  // Gray color for lines
+      stroke: "#ccc", 
       strokeWidth: 2
     }),
     
-    // Colored dots at each point with tooltips
     Plot.dot(comparisonData, {
       x: "metric",
       y: "value",
-      fill: d => d.race == "Black" ? "#ff7f0e" : "#1f77b4",  // Explicit colors
+      fill: d => d.race == "Black" ? "#ff7f0e" : "#1f77b4", 
       r: 6,
       tip: true,
       title: d => `${d.race}: ${d.value.toFixed(1)}%`
@@ -745,7 +732,7 @@ Plot.plot({
 })
 ```
 
-**Key Finding**
+#### Key Finding
 
 The visualization reveals a critical mismatch between search rates and contraband discovery rates. Black drivers show a hit rate of ${blackHitRate.toFixed(1)}%, while White drivers show ${whiteHitRate.toFixed(1)}%, meaning contraband is found 1.3 times more often when Black drivers are searched. However, recall from Part 2 that Black drivers are searched at ${blackSearchRate.toFixed(1)}% compared to White drivers at ${whiteSearchRate.toFixed(1)}%, representing a 2.2 times higher search rate.
 

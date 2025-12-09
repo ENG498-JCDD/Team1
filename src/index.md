@@ -16,12 +16,13 @@ This brings us to our hypothetical scenario. You are an acting member of Raleigh
 
 ### Hypothesis
 
-Our main hypothesis is that Black drivers face increased risk when encountering traffic stops in the Wake County area. This hypothesis is then divided into three corollary hypotheses corresponding to specific variables in our dataset. 
-H1 - Search Disparities: Black drivers are searched at disproportionately higher rates than White drivers, yet contraband discovery rates do not justify this disparity. We examine overall search rates by race, gender-specific patterns, and the "hit rate" (percentage of searches that find contraband) to determine whether searches are evidence-based or potentially biased.
+Our main hypothesis is that Black drivers face increased risk when encountering traffic stops in the Wake County area. This hypothesis is then divided into three corollary hypotheses corresponding to specific variables in our dataset.
 
-H2 - Veil of Darkness: The "Veil of Darkness" test uses natural variation in sunset times throughout the year to detect racial profiling. If officers engage in racial profiling, we would expect to see more Black drivers stopped during daylight hours (when race is more visible) compared to the same clock times during darkness. By comparing stop patterns at times like 6:30 PM in summer (daylight) versus winter (darkness), we can test whether darkness affects the racial composition of stopped drivers by reducing officers' ability to perceive race.
+**Search Disparities:** Black drivers are searched at disproportionately higher rates than White drivers, yet contraband discovery rates do not justify this disparity. We examine overall search rates by race, gender-specific patterns, and the "hit rate" (percentage of searches that find contraband) to determine whether searches are evidence-based or potentially biased.
 
-H3 - Outcome Disparities: Black drivers receive harsher outcomes (arrests, citations) compared to White drivers for similar violations. We analyze whether racial disparities exist not only in the decision to stop and search, but also in the consequences drivers face following a stop.
+**Veil of Darkness:** The "Veil of Darkness" test uses natural variation in sunset times throughout the year to detect racial profiling. If officers engage in racial profiling, we would expect to see more Black drivers stopped during daylight hours (when race is more visible) compared to the same clock times during darkness. By comparing stop patterns at times like 6:30 PM in summer (daylight) versus winter (darkness), we can test whether darkness affects the racial composition of stopped drivers by reducing officers' ability to perceive race.
+
+**Outcome Disparities:** Black drivers receive harsher outcomes (arrests, citations) compared to White drivers for similar violations. We analyze whether racial disparities exist not only in the decision to stop and search, but also in the consequences drivers face following a stop.
 
 ### About the Data
 
