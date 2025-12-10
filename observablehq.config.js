@@ -8,7 +8,7 @@ export default {
   // lets you organize them into sections and have unlisted pages.
   pages: [
     {name: "Stopped and Searched", path: "/01 Stopped and Searched"},
-    {name: "Hidden in Darkness", path: "/02 Hidden in Darkness"},
+    {name: "Hidden in Darkness?", path: "/02 Hidden in Darkness"},
     {name: "Punished Unequally", path: "/03 Punished Unequally"},
     {name: "What the Data Reveals", path: "/04 What the Data Reveals"},
   ],
