@@ -1,5 +1,10 @@
 ```js
 import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops} from "./utils/utilsH1.js";
+// LINDGREN: Import all libs at the top. BUT, you do not need to import D3 libs in an Observable Framework app context.
+// import {InternMap} from "d3-array"
+
+// LINDGREN: Moved to constants.js file to use throughout
+import {raleighPop, raleighPopulationByRace, raleighPopulationByRaceMap} from "./utils/constants.js";
 ```
 
 # Racial Disparities in Traffic Stops and Searches
@@ -7,9 +12,10 @@ import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getU
 
 ## Overview
 
-Do Black drivers experience discriminatory treatment during traffic stops in Raleigh, NC? This analysis examines five years of traffic stop data to answer that question through multiple dimensions.
+**Do Black drivers experience discriminatory treatment during traffic stops in Raleigh, NC?** This analysis examines five years of traffic stop data to answer that question through multiple dimensions.
 
 **What we examine:**
+
 1. Stop patterns by race compared to population demographics.
 2. Search rates and types of searches conducted.
 3. Contraband discovery rates and the "outcome test" for discrimination.
@@ -28,16 +34,19 @@ Let's examine the data first.
 const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true});
 ```
 
+<!-- LINDGREN: Added a style.css with my styles for this pattern for you. -->
 <p class="codeblock-caption">
-  Interactive output of full data set in <code>raleighStops</code>
+  Interactive output of initial 10 rows in <code>policestops-with-townships.csv</code>
 </p>
 
+<!-- LINDGREN: Output a smaller slice -->
 ```js
-raleighStops
+raleighStops.slice(0,10)
 ```
-## Part 1: Understanding Our Dataset by Race
 
-### The Central Question
+## Part 1: Understanding Our Dataset by Race
+<!-- LINDGREN: Added the question in the heading -->
+### The Central Question: Are drivers being stopped at equal rates?
 
 When examining traffic stop data, the most fundamental question we must ask is whether all drivers are being stopped at equal rates, or if race plays a role in who gets stopped.
 
@@ -48,10 +57,12 @@ This section establishes our demographic baseline and examines whether traffic s
 ### Building Our Baseline
 
 First, let's establish what Raleigh's population actually looks like during our study period (2011 to 2015). We'll use official U.S. Census data that covers this exact timeframe.
-```js
-import {InternMap} from "d3-array"
 
-```
+<!-- LINDGREN:
+  Moved Census constants to constants.js file to use throughout
+-->
+
+<!-- stopsByRace -->
 ```js
 const stopsByRace = oneLevelRollUpFlatMap(
   raleighStops,
@@ -59,40 +70,80 @@ const stopsByRace = oneLevelRollUpFlatMap(
   "count"
 )
 ```
+
+<!-- stopsByRaceWithPercent -->
 ```js
 // Calculate total stops and add percentages
 const totalStops = d3.sum(stopsByRace, d => d.count)
+const totalStopsNormalized = totalStops / raleighPop
 
 const stopsByRaceWithPercent = []
 
 for (const row of stopsByRace) {
-  const percentage = (row.count / totalStops) * 100
-  
-  stopsByRaceWithPercent.push({
-    race: row.race,
-    count: row.count,
-    percentage: percentage
-  })
+  const percentage = (row.count / totalStops)
+
+  // Filter out `unknown` & `other` race categories
+  if (row.race != "unknown" && row.race != "other") {
+    /** LINDGREN
+     * Using updated and mapped Census figures of
+     * Raleigh township level, instead of just Raleigh city.
+     * Why? Because the original data was at a per township level.
+    **/
+    let rowRacePop = raleighPopulationByRaceMap.get(row.race).population
+
+    stopsByRaceWithPercent.push({
+      race: row.race,
+      count: row.count,
+      /** LINDGREN
+       * Note how your percentage value
+       * is the % of just the traffic stop
+       * data's column. So, you're not accounting
+       * and normalizing for the population.
+       * So, the percentage value is really just
+       * the % of all stops.
+      **/
+      percentage: percentage,
+      /** LINDGREN
+       * Let's instead normalize stops based on
+       * the township's Census population
+      **/
+      popNormalizedCount: row.count / rowRacePop,
+    })
+  }
+  /** LINDGREN
+   * I'd just filter out what doesn't mirror
+   * the census data and note it in your notebook.
+   * And, then not visualize it either.
+   * You then should note and highlight this filtering
+   * somewhere.
+   *
+   * If you kept these categories, then you could
+   * simply put them in an else {}, then add a null
+   * value for the normed value.
+  **/
+  // else {
+  //   stopsByRaceWithPercent.push({
+  //     race: row.race,
+  //     count: row.count,
+  //     percentage: percentage,
+  //     popNormalizedCount: null,
+  //   })
+  // }
 }
-```
-```js
-// Raleigh, NC Population by Race (2011 to 2015 ACS 5 Year Estimates)
-// Source: U.S. Census Bureau, Table DP05
-// Link: https://data.census.gov/table/ACSDP5Y2015.DP05?q=Raleigh+city,+North+Carolina
-const raleighPopulationByRace = [
-  {race: "white", population: 260263, percentage: 60.2},
-  {race: "black", population: 126558, percentage: 29.3},
-  {race: "asian/pacific islander", population: 19115, percentage: 4.4},
-  {race: "hispanic", population: 15191, percentage: 3.5},
-  {race: "other", population: 9784, percentage: 2.3}
-]
 ```
 
 ### The Disparity Revealed
 
-Now comes the critical comparison. The visuals below show Raleigh's population by race on the left, and the racial breakdown of traffic stops on the right. If policing were proportional and unbiased, these two charts should look nearly identical.
+Now comes the critical comparison. The visuals below show Raleigh's population by race on the left, and the racial breakdown of traffic stops on the right. ***If policing were proportional and unbiased, these two charts should look nearly identical***.
 
 Do they?
+
+<!-- yMaxRaleighPop -->
+```js
+const yMaxRaleighPop = d3.max(stopsByRaceWithPercent, d => d.popNormalizedCount)+0.3
+```
+
+<!-- populationPlot -->
 ```js
 // First plot for Population
 const populationPlot = Plot.plot({
@@ -109,8 +160,8 @@ const populationPlot = Plot.plot({
   },
   
   y: {
-    label: "Percentage of Population",
-    domain: [0, 65],
+    label: "Racial % of Raleigh's Population",
+    domain: [0, yMaxRaleighPop],
     grid: true
   },
   
@@ -122,18 +173,21 @@ const populationPlot = Plot.plot({
   marks: [
     Plot.ruleY([0]),
     
-    Plot.barY(raleighPopulationByRace, {
-      x: "race",
-      y: "percentage",
-      fill: "race",
-      sort: {x: "-y"},
-      tip: true
-    }),
+    Plot.barY(
+      raleighPopulationByRace,
+      {
+        x: "race",
+        y: "percentage",
+        fill: "race",
+        sort: {x: "-y"},
+        tip: true
+      }
+    ),
     
     Plot.text(raleighPopulationByRace, {
       x: "race",
       y: "percentage",
-      text: d => `${d.percentage.toFixed(1)}%`,
+      text: d => `${d.percentage.toFixed(2)}`,
       dy: -10,
       fontSize: 14,
       fontWeight: "bold"
@@ -141,10 +195,12 @@ const populationPlot = Plot.plot({
   ]
 })
 ```
+
+<!-- trafficStopsPlot -->
 ```js
 // Second plot for Traffic Stops
 const trafficStopsPlot = Plot.plot({
-  title: "Traffic Stops by Race (2011-2015)",
+  title: "Normalized Traffic Stops by Race (2011-2015)",
   width: 600,
   height: 500,
   marginLeft: 100,
@@ -157,8 +213,9 @@ const trafficStopsPlot = Plot.plot({
   },
   
   y: {
-    label: "Percentage of Stops",
-    domain: [0, 65],
+    label: "Normalized Stops by Raleigh's Racial Composition",
+    // nice control of the domain. I added a trick with d3.max
+    domain: [0, yMaxRaleighPop],
     grid: true
   },
   
@@ -172,7 +229,7 @@ const trafficStopsPlot = Plot.plot({
     
     Plot.barY(stopsByRaceWithPercent, {
       x: "race",
-      y: "percentage",
+      y: "popNormalizedCount",
       fill: "race",
       sort: {x: "-y"},
       tip: true
@@ -180,8 +237,8 @@ const trafficStopsPlot = Plot.plot({
     
     Plot.text(stopsByRaceWithPercent, {
       x: "race",
-      y: "percentage",
-      text: d => `${d.percentage.toFixed(1)}%`,
+      y: "popNormalizedCount",
+      text: (d) => `${(d.popNormalizedCount.toFixed(2))}`,
       dy: -10,
       fontSize: 14,
       fontWeight: "bold"
@@ -190,6 +247,7 @@ const trafficStopsPlot = Plot.plot({
 })
 ```
 
+<!-- Disparity Revealed charts -->
 <div class="grid grid-cols-2">
   <div class="card">
     ${populationPlot}
@@ -199,21 +257,62 @@ const trafficStopsPlot = Plot.plot({
   </div>
 </div>
 
-### Understanding the Numbers
+When the population's normalized by race, the side by side comparison reveals stark disparities between police stops of Black drivers versus white drivers:
 
-The side by side comparison reveals a stark disparity:
+<!-- LINDGREN: Changes to normalization
+  Ok, since you were originally taking the % of the dataset's column, the figures and results did not account for a normed population, when accounting for racial composition of the Raleigh township. I've updated and added those normed values as new constants to use throughout.
+-->
 
- - White drivers make up **60.2%** of the population but only **40.8%** of traffic stops 
- - While Black drivers represent **29.3%** of the population yet account for **48.8%** of stops. 
- 
- This means Black drivers are stopped at **1.66x** times their population proportion.
+```js
+const whitePopPercentage = (raleighPopulationByRace.find((d) => d.race === "white" ).percentage * 100).toFixed(2)
+const blackPopPercentage = (raleighPopulationByRace.find((d) => d.race === "black" ).percentage * 100).toFixed(2)
 
-Black drivers in Raleigh are 66% more likely to be stopped than random chance would predict, while White drivers are 32% less likely to be stopped, a whopping 38.9 percentage point difference. This initial issue raises questions about whether race influences policing decisions.
+// New normed stop rates
+const whiteStopRateNormalized = ((stopsByRaceWithPercent.find((d) => d.race === "white" ).popNormalizedCount / d3.sum(stopsByRaceWithPercent, d => d.popNormalizedCount)) * 100).toFixed(2)
+const blackStopRateNormalized = ((stopsByRaceWithPercent.find((d) => d.race === "black" ).popNormalizedCount / d3.sum(stopsByRaceWithPercent, d => d.popNormalizedCount)) * 100).toFixed(2)
+
+const blackStopRate = (blackStopRateNormalized / ( (raleighPopulationByRaceMap.get("black").normedPopulation) * 100)).toFixed(2)
+const whitetopRate = (whiteStopRateNormalized / ( (raleighPopulationByRaceMap.get("black").normedPopulation) * 100)).toFixed(2)
+const blackWhiteStopRate = (blackStopRateNormalized / whiteStopRateNormalized).toFixed(2)
+```
+
+<!-- LINDGREN:
+  Thought I'd demo another way to do this with some additional HTML/CSS skills for some custom control. Just meant for inspiration. :-)
+
+  Note how you can add dynamic variables to your copy with the `${variableNameHere}` syntax.
+-->
+<div class="grid grid-cols-2 claim-comparison">
+
+  <div class="card">
+    <p>
+      <strong>White drivers</strong> represent <strong>${whitePopPercentage}%</strong> of Raleigh's total population yet only <strong>${whiteStopRateNormalized}%</strong> of police stops.
+    </p>
+  </div>
+  <div class="card">
+    <p>
+      <strong>Black drivers</strong> represent <strong>${blackPopPercentage}%</strong> of Raleigh's total population yet account for <strong>${blackStopRateNormalized}%</strong> of police stops.
+    </p>
+  </div>
+
+  <div class="card" style="grid-column: span 2">
+    <h2><strong>Implications</strong></h2>
+    <ul>
+       <li>Police stop Black drivers at <strong>${blackStopRate}x</strong> times then the respective proportion of racial population.
+       <li>Police stop Black drivers at <strong>${blackWhiteStopRate}x</strong> times than white drivers.
+       <!-- I'd need to crunch those numbers with more time lol -->
+       <!-- <li>Black drivers in Raleigh are 66% more likely to be stopped than random chance would predict.
+       <li>White drivers are 32% less likely to be stopped.
+       <li>38.9% point difference between Black and white drivers. -->
+    </ul>
+  </div>
+
+</div>
 
 ### Testing for Consistency
 
-One hypothesis could be that this disparity is a recent anomaly, perhaps the result of changes in a single year or short term policing strategies. To test this, we need to examine whether the racial disparity we observed is consistent across all five years in our dataset, or whether it varies significantly from year to year.
+One rival hypothesis could be that this disparity is a recent anomaly, perhaps the result of changes in a single year or short term policing strategies. To test this, we need to examine whether the racial disparity we observed is consistent across all five years in our dataset, or whether it varies significantly from year to year.
 
+<!-- stopsByYearRaceString -->
 ```js
 const stopsWithDates = mapDateObjectForStops(raleighStops, "datetime")
 
@@ -238,6 +337,8 @@ for (const row of stopsByYearRace) {
   })
 }
 ```
+
+<!-- Plot: Traffic Stops by Race Over Time (2011-2015) -->
 ```js
 Plot.plot({
   title: "Traffic Stops by Race Over Time (2011-2015)",
@@ -277,23 +378,26 @@ Plot.plot({
 })
 ```
 
-The time series highlights a crucial insight: racial disparities in traffic stops are stable and persistent. Across the entire 2011–2015 period, Black drivers consistently faced the highest number of stops.
+The time series highlights a crucial insight: racial disparities in traffic stops are stable and persistent. Across the entire 2011–2015 period, ...
 
+<div class="card claim-highlight">
+  <p>
+    <strong>Black drivers consistently faced the highest number of stops</strong>.
+  </p>
+</div>
 
 All racial groups followed similar overall trends, a decline from 2011 to 2013, followed by an increase through 2015. Yet the gap between Black and white drivers never closed.
 
- This consistency shows that the disparity is not a temporary anomaly or the result of a single unusual year. *Instead, it reflects a structural pattern embedded in Raleigh’s traffic stop practices as a whole*.
-
+This consistency shows that the disparity is not a temporary anomaly or the result of a single unusual year. *Instead, it reflects a structural pattern embedded in Raleigh’s traffic stop practices as a whole*.
 
 ### What This Means
 
 We've now established three critical findings:
 
-First, Black drivers are stopped at rates far exceeding their population share (**48.8%** of stops versus **29.3%** of population).
-
-Second, White drivers are stopped at rates below their population share (**40.8%** of stops versus **60.2%** of population).
-
-Third, this pattern is consistent across all five years in our dataset, meaning this is a systemic issue rather than a problem arising randomly.
+<!-- LINDGREN: revised with normalized values -->
+1. Black drivers are stopped at rates far exceeding their population share (**${blackStopRateNormalized}%** of stops versus **${blackPopPercentage}%** of population).
+2. White drivers are stopped at rates below their population share (**${whiteStopRateNormalized}%** of stops versus **${whitePopPercentage}%** of population).
+3. This pattern is consistent across all five years in our dataset, meaning this is a systemic issue rather than a problem arising randomly.
 
 But being stopped more frequently is only one dimension of the story. The next critical question is whether Black and White drivers are treated differently once they are stopped. Specifically, are Black drivers more likely to be searched? And if so, do these searches yield contraband at rates that would justify the disparity?
 
@@ -350,6 +454,8 @@ for (const raceRow of stopsByRace) {
 ### The Search Disparity
 
 The visualization below shows what percentage of traffic stops resulted in a search for each racial group. If searches were conducted without racial bias, we would expect these rates to be similar across all groups.
+
+<!-- Plot: Search Rate by Race (2011 to 2015) -->
 ```js
 Plot.plot({
   title: "Search Rate by Race (2011 to 2015)",
@@ -399,11 +505,15 @@ Plot.plot({
 })
 ```
 
+<!-- LINDGREN: Always report your finding in your headings, rather than state the abstraction -->
 #### Critical Finding
 
+<!-- LINDGREN
+  Here's another place where constants can be reused dynamically in your copy to ensure that your figures are correct and can be updated more easily, if you need to change the way you calculate your results.
+-->
 The chart reveals a clear pattern in how different racial groups are treated once stopped. Black drivers are searched at a rate of 4.6%, while White drivers are searched at only 2.1%. This means Black drivers are **2.2x more likely** to be searched than White drivers during a traffic stop.
 
-To put this in context, remember from Part 1 that Black drivers already experience disproportionate stop rates (**48.8%** of stops despite being **29.3%** of the population). Now we see a second layer of disparity. Even after being stopped, Black drivers face more than double the search rate of White drivers.
+To put this in context, remember from Part 1 that Black drivers already experience disproportionate stop rates (**${blackStopRate}%** of stops despite being **29.3%** of the population). Now we see a second layer of disparity. Even after being stopped, Black drivers face more than double the search rate of White drivers.
 
 While the "other" category shows a higher search rate at **5.1%**, this represents only a small number of stops (**2.3%** of all stops), making it less statistically significant for our analysis. 
 
@@ -503,7 +613,7 @@ Plot.plot({
       r: 8,
       tip: true
     }),
-    
+    // LINDGREN: LOVE THIS! Great application of the link visual method
     Plot.link(
       searchTypesByRace.filter(d => d.search_type == "Person Search"),
       {
@@ -526,6 +636,7 @@ Plot.plot({
 
 #### Key Observation
 
+<!-- Again, great place to have used constants with `${}` -->
 Here, the Black drivers appear at the far right of the plot dot chart, experiencing the highest search rates for both person searches (red dot at **4.36%**) and vehicle searches (blue dot at **3.75%**). White drivers, by contrast, cluster much closer to the left side of the chart, with significantly lower rates for both person searches (**1.95%**) and vehicle searches (**1.58%**).
 
 Take note of an important detail across all racial groups. The red dots (person searches) consistently appear to the right of the blue dots (vehicle searches). 

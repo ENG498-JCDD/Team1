@@ -1,0 +1,58 @@
+/* Added, since you reused some html patterns from my textbook */
+
+:root {
+  --grayColor:#999;
+  --lightGrayColor:#ddd;
+
+  --codeBlock: var(--neutralShade1);
+  --syntax-keyword: var(--accent2Shade5);
+  --syntax-entity: var(--primaryShade6);
+
+  /* COUNTERS */
+  counter-reset: codeblock;
+}
+
+.codeblock-caption {
+  margin-bottom: 1.5rem;
+  padding: 0;
+  font-size: 1rem;
+  counter-increment: codeblock; /* increment by 1 */
+
+  &.cc-image {
+    margin-bottom: 0;
+  }
+
+  &::before {
+    padding: 0.1rem 0;
+    margin-right: 0.1rem;
+    background-color: var(--theme-foreground-focus);
+    color: white;
+    content: "Codeblock " counter(codeblock) ": ";
+  }
+
+  /* IMAGES */
+  & > img {
+    max-width: 300px;
+  }
+}
+
+.claim-comparison,
+.claim-highlight {
+  grid-auto-rows: max-content;
+
+  & > .card {
+
+    & > * {
+      font-size: large;
+    }
+
+  }
+
+}
+
+/* Cards */
+.claim-highlight {
+  max-width: 620px;
+  font-size: large;
+  margin-left: 1rem;
+}

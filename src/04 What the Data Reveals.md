@@ -1,5 +1,11 @@
 # What the Data Reveals: Data Design seen with an Ethical Lens and through Structuralist Methods
 
+<!-- LINDGREN:
+  In a future version, you would functionalize all of your important findings as exportable figures to then import anywhere in your project, such as a summary rport like this.
+
+  Overall, I'm so impressed y'all! You did such an amazing job with the time we had to complete this project. I appreciate your thoughtful reflections below, which I think is a product of grounding your case in a particular scenario.
+-->
+
 ## Defense of the User: Exposing Discriminatory Enforcement Through Data Transparency
 
 Processing over 337,000 traffic stop records reveals that Black drivers are searched at 5.28% compared to White drivers at 3.16%, yet contraband discovery rates are 31.74% for Black drivers versus 34.85% for White drivers. Higher search rates aren't justified by evidence.
