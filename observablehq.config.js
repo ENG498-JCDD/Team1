@@ -26,10 +26,8 @@ export default {
   // theme: "default", // try "light", "dark", "slate", etc.
   // header: "", // what to show in the header (HTML)
 
-  header: '<div style="background: #43666bff; color: white; padding: 10px; text-align: center;">Raleigh Traffic Stop Analysis 2011-2015</div>', 
-
-  // footer: "Built with Observable.", // what to show in the footer (HTML)
-  footer: "Investigating traffic stop disparities in Raleigh, NC | Stanford Open Policing Project",
+  header: '<div style="background: #43666bff; color: white; padding: 10px; text-align: center;">Raleigh Traffic Stop Analysis 2011-2015</div>',
+  footer: `Created by Nazifa Chowdhury, Wyatt Blanchette, and Hail Zulueta | <a href="https://jcddtc.netlify.app/" target="_blank" rel="noopenner noreferrer">ENG 583 - Justice-Centered Data Design</a>`,
   // sidebar: true, // whether to show the sidebar
   sidebar: true,
   // toc: true, // whether to show the table of contents

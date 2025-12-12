@@ -1,5 +1,7 @@
 # Stopped: An Analysis of Traffic-Stops by Race in Wake County, North Carolina
 
+Created by Nazifa Chowdhury, Wyatt Blanchette, and Hail Zulueta | <a href="https://jcddtc.netlify.app/" target="_blank" rel="noopenner noreferrer">ENG 583 - Justice-Centered Data Design</a>
+
 ## Project Overview
 
 The aim of our project is to uncover biases within police traffic stops in North Carolina. There has been much research linking traffic stops to race within the state, most notably *Suspect Citizens: What 20 Million Traffic Stops Tell Us About Policing and Race* by Dr. Frank Baumgartner. Our data app builds on this scholarship but narrows the scope significantly, focusing on stops which occurred between 2011-2015 and which were conducted in Wake County. 
