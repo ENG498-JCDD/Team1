@@ -8,13 +8,13 @@ export default {
   // lets you organize them into sections and have unlisted pages.
   pages: [
     {name: "Stopped and Searched", path: "/01 Stopped and Searched"},
-    {name: "Hidden in Darkness", path: "/02 Hidden in Darkness"},
+    {name: "Hidden in Darkness?", path: "/02 Hidden in Darkness"},
     {name: "Punished Unequally", path: "/03 Punished Unequally"},
     {name: "What the Data Reveals", path: "/04 What the Data Reveals"},
   ],
 
   // Content to add to the head of the page, e.g. for a favicon:
-  head: '<link rel="icon" href="observable.png" type="image/png" sizes="32x32">',
+  head: '<link rel="icon" href="observable.png" type="image/png" sizes="32x32">\n<link rel="stylesheet" href="style.css">',
 
   // The path to the source root.
   root: "src",
@@ -26,10 +26,8 @@ export default {
   // theme: "default", // try "light", "dark", "slate", etc.
   // header: "", // what to show in the header (HTML)
 
-  header: '<div style="background: #43666bff; color: white; padding: 10px; text-align: center;">Raleigh Traffic Stop Analysis 2011-2015</div>', 
-
-  // footer: "Built with Observable.", // what to show in the footer (HTML)
-  footer: "Investigating traffic stop disparities in Raleigh, NC | Stanford Open Policing Project",
+  header: '<div style="background: #43666bff; color: white; padding: 10px; text-align: center;">Raleigh Traffic Stop Analysis 2011-2015</div>',
+  footer: `Created by Nazifa Chowdhury, Wyatt Blanchette, and Hail Zulueta | <a href="https://jcddtc.netlify.app/" target="_blank" rel="noopenner noreferrer">ENG 583 - Justice-Centered Data Design</a>`,
   // sidebar: true, // whether to show the sidebar
   sidebar: true,
   // toc: true, // whether to show the table of contents

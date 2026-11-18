@@ -1,5 +1,7 @@
 ```js
 import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops} from "./utils/utilsH1.js"
+// LINDGREN: Moved to constants.js file to use throughout
+import {raleighPop, raleighPopulationByRace, raleighPopulationByRaceMap} from "./utils/constants.js";
 ```
 # Testing the Veil of Darkness: Temporal Analysis of Traffic Stop Disparities
 
@@ -25,10 +27,13 @@ If officers are using race as a factor in stop decisions, we would expect:
 
 Before testing the Veil of Darkness theory, we need to understand when traffic stops occur throughout a typical day.
 
+<!-- raleighStops -->
 ```js
 // Load the data
 const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true})
 ```
+
+<!-- stopsWithDateTime -->
 ```js
 const stopsWithDateTime = []
 
@@ -39,6 +44,11 @@ for (const stop of raleighStops) {
   const hour = dateObject.getHours()
   const minute = dateObject.getMinutes()
   
+  /** LINDGREN
+   * LOVE THIS! What a great metric!
+   * And, I think you thoughtfully and
+   * creatively use it to test your hypothesis.
+  **/
   // Determine daylight condition
   let daylight
   
@@ -92,6 +102,7 @@ for (const stop of raleighStops) {
 }
 ```
 
+<!-- overviewStopsByHourRaceSorted -->
 ```js
 // Group ALL stops by hour and race
 const overviewStopsByHourRace = twoLevelRollUpFlatMap(
@@ -102,33 +113,67 @@ const overviewStopsByHourRace = twoLevelRollUpFlatMap(
 )
 
 // Sort by hour
-const overviewStopsByHourRaceSorted = overviewStopsByHourRace.slice().sort((a, b) => a.hour - b.hour)
+// LINDGREN: Removed the .slice() method
+// const overviewStopsByHourRaceSorted = overviewStopsByHourRace.slice().sort((a, b) => a.hour - b.hour)
+const overviewStopsByHourRaceSorted = overviewStopsByHourRace.sort((a, b) => a.hour - b.hour)
+
+// LINDGREN: Let's also normalize the data to see what we find
+const stopsByHourRaceNormed = []
+
+for (const row of overviewStopsByHourRaceSorted) {
+  // Filter out `unknown` & `other` race categories
+  if (row.race != "unknown" && row.race != "other") {
+    /** LINDGREN
+     * Using updated and mapped Census figures of
+     * Raleigh township level, instead of just Raleigh city.
+     * Why? Because the original data was at a per township level.
+    **/
+    let rowRacePop = raleighPopulationByRaceMap.get(row.race).population
+
+    stopsByHourRaceNormed.push({
+      hour: row.hour,
+      race: row.race,
+      count: row.count,
+      /** LINDGREN
+       * Let's instead normalize stops based on
+       * the township's Census population
+      **/
+      popNormalizedCount: row.count / rowRacePop,
+    })
+  }
+}
 ```
+
+<!-- PLOT: notNormedStopsByHour -->
 ```js
-Plot.plot({
+const notNormedStopsByHour = Plot.plot({
   title: "Traffic Stop Patterns by Hour and Race (2011 to 2015)",
-  width: 900,
-  height: 500,
-  marginLeft: 80,
+  // width: 900,
+  // height: 500,
+  // marginLeft: 80,
   marginBottom: 80,
   marginTop: 40,
-  marginRight: 250,
+  // marginRight: 250,
   grid: true,
   
   x: {
     label: "Hour of Day",
-    domain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    // LINDGREN: Some easier ways to create the domain:
+    // domain: [0, 23],
+    domain: [0, d3.max(overviewStopsByHourRaceSorted, d => d.hour)],
+    interval: 1,
   },
   
   y: {
     label: "Absolute Frequency (Number of Stops)",
     grid: true
   },
-  
+  // LINDGREN: Removed 'other', due to normalized values
+  // Would need to note this filtering
   color: {
     legend: true,
-    domain: ["black", "white", "hispanic", "asian/pacific islander", "other"],
-    range: ["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728", "#9467bd"]
+    domain: ["black", "white", "hispanic", "asian/pacific islander"],
+    range: ["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]
   },
   
   marks: [
@@ -147,7 +192,67 @@ Plot.plot({
     )
   ]
 })
+
+const normedStopsByHour = Plot.plot({
+  title: "Normalized Traffic Stop Patterns by Hour and Race (2011 to 2015)",
+  // width: 900,
+  // height: 500,
+  // marginLeft: 80,
+  marginBottom: 80,
+  marginTop: 40,
+  // marginRight: 250,
+  grid: true,
+
+  x: {
+    label: "Hour of Day",
+    // LINDGREN: Some easier ways to create the domain:
+    // domain: [0, 23],
+    domain: [0, d3.max(stopsByHourRaceNormed, d => d.hour)],
+    interval: 1,
+  },
+
+  y: {
+    label: "Normalized Stops Against Racial Populations",
+    grid: true
+  },
+
+  color: {
+    legend: true,
+    domain: ["black", "white", "hispanic", "asian/pacific islander"],
+    range: ["#ff7f0e", "#1f77b4", "#2ca02c", "#d62728"]
+  },
+
+  marks: [
+    Plot.ruleY([0]),
+
+    Plot.lineY(
+      stopsByHourRaceNormed,
+      {
+        x: "hour",
+        y: "popNormalizedCount",
+        stroke: "race",
+        strokeWidth: 2.5,
+        tip: true,
+        title: d => `${d.race}: ${d.popNormalizedCount.toFixed(2)} stops at hour ${d.hour}`
+      }
+    )
+  ]
+})
 ```
+
+<div class="grid grid-cols-2">
+
+  <div class="card">
+    ${notNormedStopsByHour}
+
+  </div>
+
+  <div class="card">
+    ${normedStopsByHour}
+
+  </div>
+
+</div>
 
 The visualization shows clear patterns in when traffic stops occur:
 - Early morning **(0–6 AM)**: Stops are at their lowest levels, with all racial groups following similar trends.
@@ -325,12 +430,21 @@ const blackWhiteOnly = []
 for (const row of stopsByHourRaceLight) {
   // Only include Black and White
   if (row.race == "black" || row.race == "white") {
+    /** LINDGREN
+     * Using updated and mapped Census figures of
+     * Raleigh township level, instead of just Raleigh city.
+     * Why? Because the original data was at a per township level.
+    **/
+    let rowRacePop = raleighPopulationByRaceMap.get(row.race).population
+
     blackWhiteOnly.push({
       hour: row.hour,
       race: row.race,
       light_condition: row.light_condition,
       count: row.count,
-      percentage: row.count / grandTotal
+      percentage: row.count / grandTotal,
+      // LINDGREN: Adding normed percentage to population
+      normedPercentage: row.count / rowRacePop,
     })
   }
 }
@@ -361,21 +475,22 @@ const stopPercentages = blackWhiteOnly.map(
 
 - **Standard deviation of traffic stops**: On average, all traffic stops per hour deviate from the mean by <strong>${(100 * d3.deviation(stopPercentages)).toFixed(2)}%</strong>. -->
 
-
+<!-- plotByLight &  normedPlotByLight -->
 ```js
-Plot.plot({
+const plotByLight = Plot.plot({
   title: "Traffic Stop Distribution by Hour, Race, and Light Condition",
-  width: 1000,
-  height: 500,
-  marginLeft: 80,
+  // width: 1000,
+  // height: 500,
+  // marginLeft: 80,
   marginBottom: 60,
   marginTop: 30,
-  marginRight: 250,
+  // marginRight: 250,
   grid: true,
   
   x: {
     label: "Hour of Day",
-    domain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    // domain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    domain: [0, 23]
   },
   
   y: {
@@ -386,7 +501,7 @@ Plot.plot({
   color: {
     legend: true,
     domain: ["black", "white"],
-    range: ["#ff7f0e", "#1f77b4"]
+    range: ["black", "red"],
   },
   
   marks: [
@@ -404,15 +519,90 @@ Plot.plot({
       {
         x: "hour",
         y: "percentage",
-        fill: d => d.race == "black" ? "#ff7f0e" : "#1f77b4",
-        r: 5,
+        // LINDGREN: Use facets to utilize groupings
+        fy: "light_condition",
+        // fill: d => d.race == "black" ? "#ff7f0e" : "#1f77b4",
+        fill: d => d.race == "black" ? "black" : "red",
+        // LINDGREN: Use the value to create size differences
+        // r: 5,
+        r: "normedPercentage",
         tip: true,
         title: d => `${d.race}, ${d.light_condition}\nHour ${d.hour}: ${(d.percentage * 100).toFixed(2)}%`
       }
     )
   ]
 })
+
+const normedPlotByLight = Plot.plot({
+  title: "Normalized Traffic Stop Distribution by Hour, Race, and Light Condition",
+  // width: 1000,
+  // height: 500,
+  // marginLeft: 80,
+  marginBottom: 60,
+  marginTop: 30,
+  // marginRight: 250,
+  grid: true,
+
+  x: {
+    label: "Hour of Day",
+    // domain: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    domain: [0, 23]
+  },
+
+  y: {
+    label: "Normalized Percentage",
+    percent: true
+  },
+
+  color: {
+    legend: true,
+    domain: ["black", "white"],
+    range: ["black", "red"],
+  },
+
+  marks: [
+
+    // Mean line
+    Plot.ruleY([d3.mean(blackWhiteOnly, d => d.normedPercentage)], {
+      stroke: "gray",
+      strokeWidth: 2,
+      strokeDasharray: "4,4"
+    }),
+
+    // Dots for each data point
+    Plot.dot(
+      blackWhiteOnly,
+      {
+        x: "hour",
+        y: "normedPercentage",
+        // LINDGREN: Use facets to utilize groupings
+        fy: "light_condition",
+        // fill: d => d.race == "black" ? "#ff7f0e" : "#1f77b4",
+        fill: d => d.race == "black" ? "black" : "red",
+        // LINDGREN: Use the value to create size differences
+        // r: 5,
+        r: "normedPercentage",
+        tip: true,
+        title: d => `${d.race}, ${d.light_condition}\nHour ${d.hour}: ${(d.normedPercentage * 100).toFixed(2)}%`
+      }
+    )
+  ]
+})
 ```
+
+<div class="grid grid-cols-2">
+
+  <div class="card">
+    ${plotByLight}
+
+  </div>
+
+  <div class="card">
+    ${normedPlotByLight}
+
+  </div>
+
+</div>
 
 This dot plot shows each combination of hour, race, and light condition as a percentage of total Black and White stops. 
 

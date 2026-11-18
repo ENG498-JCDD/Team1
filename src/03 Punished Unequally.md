@@ -1,5 +1,7 @@
 ```js
 import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getUniquePropListBy,mapDateObjectForStops,addDateAndTimeFeatures,getRace} from "./utils/utilsH1.js";
+// LINDGREN: Moved to constants.js file to use throughout
+import {raleighPop, raleighPopulationByRace, raleighPopulationByRaceMap} from "./utils/constants.js";
 ```
 
 # Punished Unequally: An Outcomes Based Analysis
@@ -7,7 +9,7 @@ import {oneLevelRollUpFlatMap,twoLevelRollUpFlatMap,threeLevelRollUpFlatMap,getU
 
 The chapter provides an in-depth analysis of the outcomes black and white driver's face for traffic stops. It analyzes officer's reasons officers stop drivers in conjunction with outcomes, and looks to uncover distinct patterns in the penalties driver's may recieve for getting pulled over. This involves three variables in our dataset: race, reason_for_stop, and outcome.
 
-**Our Hypothesis:** Our hypothesis is: Black drivers receive harsher outcomes than White drivers for the same violations, with fewer warnings and more arrests. This happens because officers exercise discretion based on race, escalating punishment for Black drivers. Without standardized protocols, discriminatory outcomes will persist, but objective enforcement guidelines can reduce racial-based disparities.
+**Our Hypothesis:** Black drivers receive harsher outcomes than White drivers for the same violations, with fewer warnings and more arrests. This happens because officers exercise discretion based on race, escalating punishment for Black drivers. Without standardized protocols, discriminatory outcomes will persist, but objective enforcement guidelines can reduce racial-based disparities.
 
 ## Research Question
 
@@ -16,6 +18,7 @@ Are black drivers searched for similar reasons to white drivers, and are these s
 Let's investigate the data to find out!
 
 ## Load the data
+
 ```js
 const raleighStops = FileAttachment("./data/policestops-with-townships.csv").csv({typed: true})
 ```
@@ -26,27 +29,29 @@ const updatedRaleighStops = addDateAndTimeFeatures(raleighStops)
 ```
 
 <p class="codeblock-caption">
-  Interactive output of our full dataset <code>raleighStops</code>
+  Interactive output of initial 10 rows of full dataset <code>policestops-with-townships.csv</code>
 </p>
 
 ```js
-raleighStops
+raleighStops.slice(0,10)
 ```
 
 ## Normalize The Data
 Before we begin, let's normalize our data based on population. As of the most recent census data, whites accounted for 59.1 percent of Raleigh's total population and the black population represented only 21.9 percent. Let's adjust our data to reflect this by mapping racial categories to population ratios and then outputting the data grouped by race with normalized frequencies.
 
 ```js
-const raleighPop = 131023
-const raleighPopRatios = new Map([
-  ["white", 0.591*raleighPop],
-  ["black", 0.219*raleighPop],
-  ["hispanic", 0.096*raleighPop],
-  ["native", 0.003*raleighPop],
-  ["asian/pacific islander", 0.044*raleighPop],
-  ["unknown", null],
-])
+// const raleighPop = 131023
+// const raleighPopRatios = new Map([
+//   ["white", 0.591*raleighPop],
+//   ["black", 0.219*raleighPop],
+//   ["hispanic", 0.096*raleighPop],
+//   ["native", 0.003*raleighPop],
+//   ["asian/pacific islander", 0.044*raleighPop],
+//   ["unknown", null],
+// ])
 ```
+
+<!-- raleighStopsByRace -->
 ```js
 const raleighStopsByRace = d3.rollups(
   raleighStops,
@@ -58,8 +63,9 @@ const raleighStopsByRace = d3.rollups(
       return {
         race: leaves[0].race,
         stopFreq: leaves.length,
-        // Use the normalizing formula and mapped ratio value by race
-        normalizedStopFreq: leaves.length / raleighPopRatios.get(leaves[0].race),
+        // LINDGREN: Use the normalizing formula and mapped ratio value by race
+        // normalizedStopFreq: leaves.length / raleighPopRatios.get(leaves[0].race),
+        normalizedStops: leaves.length / raleighPopulationByRaceMap.get(leaves[0].race).population,
       }
     }
     else {
@@ -68,7 +74,7 @@ const raleighStopsByRace = d3.rollups(
         stopFreq: leaves.length,
         // We can't account for the "unknown" race value in the data,
         // so set it to null.
-        normalizedStopFreq: null,
+        normalizedStops: null,
       }
     }
   },
@@ -81,17 +87,24 @@ const flatStopsByRace = raleighStopsByRace.map(
     return racesList
   }
 )
+
+// LINDGREN: Add reusable filtered version
+const filteredFlatStopsByRace = flatStopsByRace.filter((d) => (d.race != "other" && d.race != "unknown"))
 ```
 
-```js
+<!-- LINDGREN
+  Reuse Nazifa's since it's already the same material. Suggests that a revision would include this info on a home page perhaps.
+-->
+
+<!-- ```js
 Plot.plot({
  title: "Raleigh Traffic Stops by Race",
- width: 900,
- height: 500,
- marginLeft: 80,
- marginBottom: 80,
- marginTop: 40,
- marginRight: 250,
+//  width: 900,
+//  height: 500,
+//  marginLeft: 80,
+//  marginBottom: 80,
+//  marginTop: 40,
+//  marginRight: 250,
  grid: true,
  x: {label: "Race", padding: 0},
  y: {label: "Normalized Stop Freq", padding: 0},
@@ -100,10 +113,10 @@ Plot.plot({
    Plot.ruleY([0]),
    Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
    Plot.barY(
-     flatStopsByRace.filter((d) => (d.race != "other" && d.race != "unknown")),
+     filteredFlatStopsByRace,
      {
        x: "race",
-       y: "normalizedStopFreq",
+       y: "normalizedStops",
        insetRight: 10,
        insetLeft: 10,
        tip: true,
@@ -113,7 +126,130 @@ Plot.plot({
  ]
 })
 
+``` -->
+
+<!-- yMaxRaleighPop -->
+```js
+const yMaxRaleighPop = d3.max(filteredFlatStopsByRace, d => d.normalizedStops)+0.3
 ```
+
+<!-- populationPlot -->
+```js
+// First plot for Population
+const populationPlot = Plot.plot({
+  title: "Raleigh Population by Race (2011-2015)",
+  // width: 600,
+  // height: 500,
+  // marginLeft: 100,
+  // marginBottom: 80,
+  grid: true,
+
+  x: {
+    label: "Race",
+    padding: 0.2
+  },
+
+  y: {
+    label: "Racial % of Raleigh's Population",
+    domain: [0, yMaxRaleighPop],
+    grid: true
+  },
+
+  color: {
+    legend: true,
+    scheme: "tableau10"
+  },
+
+  marks: [
+    Plot.ruleY([0]),
+
+    Plot.barY(
+      raleighPopulationByRace,
+      {
+        x: "race",
+        y: "percentage",
+        fill: "race",
+        sort: {x: "-y"},
+        tip: true
+      }
+    ),
+
+    Plot.text(raleighPopulationByRace, {
+      x: "race",
+      y: "percentage",
+      text: d => `${d.percentage.toFixed(2)}`,
+      dy: -10,
+      fontSize: 14,
+      fontWeight: "bold"
+    })
+  ]
+})
+```
+
+<!-- trafficStopsPlot -->
+```js
+// Second plot for Traffic Stops
+const trafficStopsPlot = Plot.plot({
+  title: "Normalized Traffic Stops by Race (2011-2015)",
+  // width: 600,
+  // height: 500,
+  // marginLeft: 100,
+  marginBottom: 80,
+  grid: true,
+
+  x: {
+    label: "Race",
+    padding: 0.2
+  },
+
+  y: {
+    label: "Normalized Stops by Raleigh's Racial Composition",
+    // nice control of the domain. I added a trick with d3.max
+    domain: [0, yMaxRaleighPop],
+    grid: true
+  },
+
+  color: {
+    legend: true,
+    scheme: "tableau10"
+  },
+
+  marks: [
+    Plot.ruleY([0]),
+
+    Plot.barY(filteredFlatStopsByRace, {
+      x: "race",
+      y: "normalizedStops",
+      fill: "race",
+      sort: {x: "-y"},
+      tip: true
+    }),
+
+    Plot.text(filteredFlatStopsByRace, {
+      x: "race",
+      y: "normalizedStops",
+      text: (d) => `${(d.normalizedStops.toFixed(2))}`,
+      dy: -10,
+      fontSize: 14,
+      fontWeight: "bold"
+    })
+  ]
+})
+```
+
+<!-- Normalizing Summary charts -->
+<div class="grid grid-cols-2">
+
+  <div class="card">
+    ${populationPlot}
+  </div>
+
+  <div class="card">
+    ${trafficStopsPlot}
+  </div>
+
+</div>
+
 ## Part 1: Reason For Stop
 
 Since chapter two *Stopped and Searched* has already outlined the racial compostion of our dataset, I will begin with investigating if the reasons black drivers are getting pulled over are comparable to white ones. This will involve an analysis of the *reason_for_stop* category. 
@@ -150,12 +286,17 @@ const afRaceByReason = d3.rollups(
 const afRaceByReasonUpdated = afRaceByReason.map(
  (stop) => {
    let af = stop.count
-   stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+  //  stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+   stop.normalizedCount = af / raleighPopulationByRaceMap.get(stop.race).population
    stop.raceAndReason = stop.race + "-" + stop.reason_for_stop
    return stop
  }
 )
+
+const filteredRaceByReason = afRaceByReasonUpdated.filter((d) => (d.race != "other" && d.race != "unknown"))
 ```
+
+<!-- PLOT: "Reason for Stop Racial Breakdown" -->
 ```js
 Plot.plot({
  title: "Reason for Stop Racial Breakdown",
@@ -169,30 +310,59 @@ width: 1050,
  label: null,
  color: {legend: true},
  x: {label: "Reason for Stop", padding: 0},
- y: {label: "Absolute Frequency", padding: 0},
+ y: {label: "Normalized Frequency", padding: 0},
  marks: [
-   Plot.ruleY([0]),
-   Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
-   Plot.barY(
-     afRaceByReasonUpdated,
-     {
-       x: "reason_for_stop",
-       y: "normalizedCount",
-       fill: "race",
-       sort: {x: "-y"},
-       insetRight: 10,
-       insetLeft: 10,
-       tip: true,
-       color: {
-   domain: ["White", "Black", "Hispanic", "Asian"],
-   range: ["red", "blue", "green", "black"]
-     }
-   })
+  Plot.ruleY([0]),
+  Plot.axisX({label: null, lineWidth: 8, marginBottom: 40}),
+  Plot.barY(
+    // LINDGREN: Used filtered to remove null for sorting
+    filteredRaceByReason,
+    {
+      x: "reason_for_stop",
+      y: "normalizedCount",
+      // LINDGREN: Variation to create as facet
+      // to more easily parse by race
+      fill: "race",
+      fy: "race",
+      sort: {x: "-y", fy: "-x", reduce: "mean"},
+      insetRight: 20,
+      insetLeft: 20,
+      tip: true,
+      // color: {
+      //   domain: ["White", "Black", "Hispanic", "Asian"],
+      //   range: ["red", "blue", "green", "black"]
+      // }
+    }
+  )
  ]
 })
-
 ```
-As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition. Black drivers are roughly **1.3** times more likely than white drivers to get pulled over for Vehicle Regulatory Violations, and **.7** times more likely to get pulled over for possible speeding infractions. Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
+
+<!-- LINDGREN
+  Added constants to use in copy dynamically: Vehicle Regulatory and Speed Limit Violations
+-->
+```js
+const blackVRV = (afRaceByReasonUpdated.find( (d) => d.race === "black" && d.reason_for_stop === "Vehicle Regulatory Violation" ).normalizedCount)
+const whiteVRV = (afRaceByReasonUpdated.find( (d) => d.race === "white" && d.reason_for_stop === "Vehicle Regulatory Violation" ).normalizedCount)
+const blackVsWhiteVRV = (blackVRV / whiteVRV).toFixed(2)
+
+const blackSLV = (afRaceByReasonUpdated.find( (d) => d.race === "black" && d.reason_for_stop === "Speed Limit Violation" ).normalizedCount)
+const whiteSLV = (afRaceByReasonUpdated.find( (d) => d.race === "white" && d.reason_for_stop === "Speed Limit Violation" ).normalizedCount)
+const blackVsWhiteSLV = (blackSLV / whiteSLV).toFixed(2)
+```
+
+As evidenced here, Vehicle Regulatory and Speed Limit Violations are the primary reasons drivers are stopped. There were a higher number of black drivers pulled over for every category except Speed Limit and Driving While Impaired, a number even more startling when you considers Raleigh and Wake County's racial composition.
+
+<!-- LINDGREN
+  Updated the style and method of computing your results, which changed with updated Census data figures at the township level.
+-->
+<div class="card claim-highlight">
+
+Black drivers are roughly **${blackVsWhiteVRV}** times more likely than white drivers to get pulled over for Vehicle Regulatory Violations, and **${blackVsWhiteSLV}** times more likely to get pulled over for possible speeding infractions.
+
+</div>
+
+Through this prelimiary analysis, we already start to see evidence of some of the biases posited in our hypothesis.
 
 ## Part 2: Outcome by Race
 
@@ -212,7 +382,8 @@ const afRaceByOutcome = d3.rollups(
 const afRaceByOutcomeUpdated = afRaceByOutcome.map(
  (stop) => {
    let af = stop.count
-   stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+  //  stop.normalizedCount = af / raleighPopRatios.get(stop.race)
+   stop.normalizedCount = af / raleighPopulationByRaceMap.get(stop.race).population
    stop.raceAndReason = stop.race + "-" + stop.outcome
    return stop
  }
@@ -303,7 +474,9 @@ const normalizedOutcomeTime = outcomeTime.map(
     // Parse out race value in the new combined column
     let raceCheck = getRace(stop.race_and_outcome)
     // Add normalized counts
-    stop.normalizedAF = stop.af / raleighPopRatios.get(raceCheck)
+    // LINDGREN: Updated Census figures
+    // stop.normalizedAF = stop.af / raleighPopRatios.get(raceCheck)
+    stop.normalizedAF = stop.af / raleighPopulationByRaceMap.get(raceCheck).population
 
     return stop
  }
@@ -350,7 +523,9 @@ width: 900,
 ## Part 3: Reason For Stop By Outcome and Race
 Through an analysis of each of these categories both by frequency and time, we have already started to identify some patterns. Now let's group all three variables and see what findings may emerge. Considering the sheer amount of *Vehicle Regulatory* and *Speed Limit Violations*, plus lowered *severity* compared to other reason represented in our dataset, let's focus on these two variables for now.
 
-
+<!-- LINDGREN
+  This rollup should be consistent and follow the same normalizing work too
+-->
 ```js
 const filteredReasons = raleighStops.filter(d =>
 (d.reason_for_stop == "Vehicle Regulatory Violation" || d.reason_for_stop == "Speed Limit Violation") && d.outcome != "NA")
